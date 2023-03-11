@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<title>Create MSM Charter Invoice</title>
+</head>
+<body>
+    <h1>Minnesota Streetcar Museum Custom Application Server</h1>
+    <h2>Welcome {{ user.get("name") }}!</h2>
+	<a href="/">Home</a> - <a href="/logout">Logout</a>
+	<hr>
+	<h1>Submit this form to create a new charter invoice</h1>
+	<form action="/charters/createInvoice" method="post">
+		<label for="fname">First Name:</label><br>
+		<input type="text" id="fname" name="fname">*<br>
+		<label for="lname">Last Name:</label><br>
+		<input type="text" id="lname" name="lname">*<br>
+		<label for="cname">Organization/Company Name: (optional)</label><br>
+		<input type="text" id="cname" name="cname"><br>
+		<label for="email">Email Address:</label>*<br>
+		<input type="email" id="email" name="email"><br>
+		Charter Location: *<br>
+		{% for location in locations %}
+		<input type="radio" id="{{ location }}" name="charter_location" value="{{ location }}">
+		<label for="{{ location }}">{{ location }}</label><br>
+		{% endfor %}
+		<label for="charter_date">Charter Date:</label><br>
+		<input type="date" id="charter_date" name="charter_date">*<br>
+		<label for="start_time">Enter charter start time:</label>*<br>
+		<input type="time" id="start_time" name="start_time"><br>
+		<label for="end_time">Enter charter end time:</label>*<br>
+		<input type="time" id="end_time" name="end_time"><br>
+		<label for="charge">Enter Amount to Charge:</label>*<br>
+		$<input type="number" step="any" id="charge" name="charge"><br>
+		Please double check all entries before submitting!<br>
+		<input type="submit" value="Submit">
+	</form>
+	</body>
+</html>

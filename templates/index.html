@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MSM Custom Application Server</title>
+</head>
+<body>
+    <h1>Minnesota Streetcar Museum Custom Application Server</h1>
+    <h2>Welcome {{ user.get("name") }}!</h2>
+    <a href="/">Home</a> - <a href="/logout">Logout</a>
+    <hr>
+    <h2>Menu:</h2>
+    <ul>
+    {% if 'CharterInvoice.Create' in roles %}
+      <li><a href='/charters/createInvoice'>Create Charter Invoice</a></li>
+    {% endif %}
+  </ul>
+</body>
+</html>
+

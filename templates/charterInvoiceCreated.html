@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<title>MSM Charter Invoice Confirmation</title>
+</head>
+<body>
+    <h1>Minnesota Streetcar Museum Custom Application Server</h1>
+    <h2>Welcome {{ user.get("name") }}!</h2>
+	<a href="/">Home</a> - <a href="/logout">Logout</a>
+	<hr>
+	<h1>A charter invoice has been created with the following details</h1>
+	Invoice Number: {{result['invoiceNumber']}}<br>
+	Invoice ID: {{result['invoiceID']}}<br>
+	First Name: {{result['fname']}}<br>
+	Last Name: {{result['lname']}}<br>
+	Organization/Company Name: {{result['cname']}}<br>
+	Email Address: {{result['email']}}<br>
+	Charter Location: {{result['charter_location']}}<br>
+	Charter Date: {{result['charter_date']}}<br>
+	Charter start time: {{result['start_time']}}<br>
+	Charter end time: {{result['end_time']}}<br>
+	Amount to Charge: ${{result['charge']}}<br>
+	<hr>
+	<p>Note invoice numbers are only unique per location! Invoice IDs are globally unique.</p>
+	</body>
+</html>

@@ -1,0 +1,13 @@
+[Unit]
+Description=uWSGI instance to serve msm passport
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/apps/msmpassport
+Environment="PATH=/var/www/apps/msmpassport/bin"
+ExecStart=/var/www/apps/msmpassport/bin/uwsgi --ini msmpassport.ini
+
+[Install]
+WantedBy=multi-user.target

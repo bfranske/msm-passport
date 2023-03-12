@@ -1,0 +1,25 @@
+# Application ID of Square App
+applicationID: "SQUAREIDHERE"
+
+# Application Access Token
+accessToken: "SQUAREACCESSTOKENHERE"
+
+# Square API Base URL (switch for sanbox/production)
+squareBaseURL: 'https://connect.squareupsandbox.com'
+
+# Square API Version String
+squareApiVersion: '2022-04-20'
+
+# Charter Locations
+locations:
+  CHSL: 'LOCATIONIDHERE'
+  ESL: 'LOCATIONIDHERE'
+
+# Charter Catalog Object ID
+charterObjectID: 'CATALOGOBJECTIDHERE'
+
+# Charter Invoice Note (note this is using yaml block scaler, keeping newlines and with no newline at the end)
+invoiceNote: |-
+  Thank you for your patronage! We are an all-volunteer 501(c)3 non-profit dedicated to preserving Minnesota's electric transit history.
+
+  If you have questions about this invoice or need assistance please contact the MN Streetcar Museum person who you have been working with. Please DO NOT reply to this email as responses will go into our general email box and are not likely to get to the right person in a timely manner.

@@ -1,0 +1,23 @@
+# Application (client) ID of app registration
+clientID: "MICROSOFTCLIENTIDHERE"
+
+# Application Client Secret
+clientSecret: "MICROSOFTCLIENTSECRETHERE"
+
+# App Authority URI
+authorityURI: "MICROSOFTAUTHORITYURI"
+
+# Redirect Path Set in Azure AD Application Registration
+redirectPath: "/getAToken"
+
+# Graph API Permissions Scope
+permissionScope: 
+    - "User.ReadBasic.All"
+    - "GroupMember.Read.All"
+
+# Set the flask_session backend
+sessionType: "filesystem"
+
+# Sample Graph API URIs
+endpoint: 'https://graph.microsoft.com/v1.0/users'
+groupEndpoint: 'https://graph.microsoft.com/v1.0/me/transitiveMemberOf/microsoft.graph.group'

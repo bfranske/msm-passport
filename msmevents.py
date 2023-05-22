@@ -45,6 +45,7 @@ def processEventCustomersForm(form):
     totalTicketsSold=0
     customers = []
     for order in orders:
+        log.info('Order: '+str(order))
         if variationID:
             for item in order['line_items']:
                 if item['id'] == eventID and item['variation_id'] == variationID:

@@ -24,7 +24,6 @@ except IOError:
 def getEventList():
     r = requests.get(eventsConfig['wcBaseURL']+'products?category='+str(eventsConfig['wcCategoryID'])+'per_page=100&orderby=date', auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
     events = r.json()
-    log.info('Event listing found')
     return events
 
 def getURLs():
@@ -45,6 +44,7 @@ def processEventCustomersForm(form):
     totalTicketsSold=0
     customers = []
     for order in orders:
+        log.info(order)
         if variationID:
             for item in order['line_items']:
                 if item['id'] == eventID and item['variation_id'] == variationID:

@@ -56,7 +56,7 @@ def processEventCustomersForm(form):
                     customer = {'firstName': order['shipping']['first_name'], 'lastName': order['shipping']['last_name'], 'email': order['billing']['email'], 'qty': item['quantity']}
                     customers.append(customer)
     # If there are more than 100 people...
-    if 'url' in r.links.get('next'):
+    if r.links.get('next'):
         r = requests.get(response.links['next']['url'], auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
         orders = r.json()
         for order in orders:

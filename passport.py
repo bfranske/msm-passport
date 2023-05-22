@@ -82,7 +82,7 @@ def eventCustomers():
     token = _get_token_from_cache(passportConfig['permissionScope'])
     if not token:
         return redirect(url_for("login"))
-    if not 'Events.ViewCustomers' in session['user']['roles']:
+    if not 'SpecialEvents.Purcases.Get' in session['user']['roles']:
         return redirect(url_for("index"))
     if request.method == 'POST':
         data = msmevents.processEventCustomersForm(request.form)
@@ -95,7 +95,7 @@ def eventAjax():
     token = _get_token_from_cache(passportConfig['permissionScope'])
     if not token:
         return redirect(url_for("login"))
-    if not 'Events.ViewCustomers' in session['user']['roles']:
+    if not 'SpecialEvents.Purcases.Get' in session['user']['roles']:
         return redirect(url_for("index"))
     else:
         return render_template('eventVariations.html', variations=msmevents.getVariations(request.form))

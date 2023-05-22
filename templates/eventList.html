@@ -1,6 +1,6 @@
 <html>
         <head>
-            {% if eventDetails['variationName' %}
+            {% if eventDetails['variationName'] %}
                 <title>MSM Event Ticket Sales Details - {{eventDetails['eventName']}} - {{eventDetails['variationName']}}</title>
             {% else %}
             <title>MSM Event Ticket Sales Details - {{eventDetails['eventName']}}</title>
@@ -16,7 +16,7 @@
                                 </style>
         </head>
         <body>
-            {% if eventDetails['variationName' %}
+            {% if eventDetails['variationName'] %}
                 <h1>MSM Event Ticket Sales Details - {{eventDetails['eventName']}} - {{eventDetails['variationName']}}</h1>
             {% else %}
                 <h1>MSM Event Ticket Sales Details - {{eventDetails['eventName']}}</h1>

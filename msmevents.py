@@ -39,7 +39,8 @@ def getVariations(form):
 def processEventCustomersForm(form):
     #Right now only works for up to 200 people, needs recursion for more.
     eventID = int(form['eventID'])
-    variationID = int(form.get('variationID'))
+    if form.get('variationID'):
+        variationID = int(form['variationID'])
     r = requests.get(eventsConfig['wcBaseURL']+'orders?product='+str(eventID)+'&per_page=100', auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
     orders = r.json()
     totalTicketsSold=0

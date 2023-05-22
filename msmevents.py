@@ -41,10 +41,10 @@ def processEventCustomersForm(form):
     variationID = int(form['variationID'])
     r = requests.get(eventsConfig['wcBaseURL']+'orders?product='+str(eventID)+'&per_page=500', auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
     orders = r.json()
+    log.info('All Order data: '+json.dumps(orders))
     totalTicketsSold=0
     customers = []
     for order in orders:
-        log.info('Order data: '+json.dumps(order))
         if variationID:
             for item in order['line_items']:
                 if item['id'] == eventID and item['variation_id'] == variationID:

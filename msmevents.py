@@ -4,6 +4,8 @@ import json
 import yaml
 import logging
 
+log = logging.getLogger(__name__)
+
 # Load configuration
 try:
     with open("config-msmevents.yaml", 'r') as stream:
@@ -22,7 +24,7 @@ except IOError:
 def getEventList():
     r = requests.get(eventsConfig['wcBaseURL']+'products?category='+str(eventsConfig['wcCategoryID'])+'per_page=100&orderby=date', auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
     events = r.json()
-    app.logger.info('Event listing found')
+    log.info('Event listing found')
     return events
 
 def getURLs():

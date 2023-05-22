@@ -47,13 +47,12 @@ def processEventCustomersForm(form):
     for order in orders:
         if variationID:
             for item in order['line_items']:
-                log.info('Item Data: '+str(item))
-                if item['id'] == eventID and item['variation_id'] == variationID:
+                if item['product_id'] == eventID and item['variation_id'] == variationID:
                     customer = {'firstName': order['shipping']['first_name'], 'lastName': order['shipping']['last_name'], 'email': order['billing']['email'], 'qty': item['quantity']}
                     customers.append(customer)
         else:
             for item in order['line_items']:
-                if item['id'] == eventID:
+                if item['product_id'] == eventID:
                     customer = {'firstName': order['shipping']['first_name'], 'lastName': order['shipping']['last_name'], 'email': order['billing']['email'], 'qty': item['quantity']}
                     customers.append(customer)
     # If there are more than 100 people...

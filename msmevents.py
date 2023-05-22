@@ -37,11 +37,11 @@ def getVariations(form):
     return variations
 
 def processEventCustomersForm(form):
+    #Right now only works for up to 200 people, needs recursion for more.
     eventID = int(form['eventID'])
     variationID = int(form['variationID'])
-    r = requests.get(eventsConfig['wcBaseURL']+'orders?product='+str(eventID)+'&per_page=500', auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
+    r = requests.get(eventsConfig['wcBaseURL']+'orders?product='+str(eventID)+'&per_page=100', auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
     orders = r.json()
-    log.info('All Order data: '+json.dumps(orders))
     totalTicketsSold=0
     customers = []
     for order in orders:
@@ -55,6 +55,21 @@ def processEventCustomersForm(form):
                 if item['id'] == eventID:
                     customer = {'firstName': order['shipping']['first_name'], 'lastName': order['shipping']['last_name'], 'email': order['billing']['email'], 'qty': item['quantity']}
                     customers.append(customer)
+    # If there are more than 100 people...
+    if 'url' in r.links.get('next'):
+        r = requests.get(response.links['next']['url'], auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
+        orders = r.json()
+        for order in orders:
+            if variationID:
+                for item in order['line_items']:
+                    if item['id'] == eventID and item['variation_id'] == variationID:
+                        customer = {'firstName': order['shipping']['first_name'], 'lastName': order['shipping']['last_name'], 'email': order['billing']['email'], 'qty': item['quantity']}
+                        customers.append(customer)
+            else:
+                for item in order['line_items']:
+                    if item['id'] == eventID:
+                        customer = {'firstName': order['shipping']['first_name'], 'lastName': order['shipping']['last_name'], 'email': order['billing']['email'], 'qty': item['quantity']}
+                        customers.append(customer)
     eventDetails = {'eventID': eventID, 'eventName': form['eventName'], 'variationID': variationID, 'variationName': form['variationName'], 'totalTicketsSold': totalTicketsSold}
     data = {'eventDetails': eventDetails, 'customers': customers}
     return data

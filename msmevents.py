@@ -50,11 +50,13 @@ def processEventCustomersForm(form):
                 if item['product_id'] == eventID and item['variation_id'] == variationID:
                     customer = {'firstName': order['shipping']['first_name'], 'lastName': order['shipping']['last_name'], 'email': order['billing']['email'], 'qty': item['quantity']}
                     customers.append(customer)
+                    totalTicketsSold+=item['quantity']
         else:
             for item in order['line_items']:
                 if item['product_id'] == eventID:
                     customer = {'firstName': order['shipping']['first_name'], 'lastName': order['shipping']['last_name'], 'email': order['billing']['email'], 'qty': item['quantity']}
                     customers.append(customer)
+                    totalTicketsSold+=item['quantity']
     # If there are more than 100 people...
     if r.links.get('next'):
         r = requests.get(response.links['next']['url'], auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
@@ -65,11 +67,13 @@ def processEventCustomersForm(form):
                     if item['id'] == eventID and item['variation_id'] == variationID:
                         customer = {'firstName': order['shipping']['first_name'], 'lastName': order['shipping']['last_name'], 'email': order['billing']['email'], 'qty': item['quantity']}
                         customers.append(customer)
+                        totalTicketsSold+=item['quantity']
             else:
                 for item in order['line_items']:
                     if item['id'] == eventID:
                         customer = {'firstName': order['shipping']['first_name'], 'lastName': order['shipping']['last_name'], 'email': order['billing']['email'], 'qty': item['quantity']}
                         customers.append(customer)
+                        totalTicketsSold+=item['quantity']
     eventDetails = {'eventID': eventID, 'eventName': form['eventName'], 'variationID': variationID, 'variationName': form['variationName'], 'totalTicketsSold': totalTicketsSold}
     data = {'eventDetails': eventDetails, 'customers': customers}
     return data

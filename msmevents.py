@@ -47,6 +47,7 @@ def processEventCustomersForm(form):
     for order in orders:
         if variationID:
             for item in order['line_items']:
+                log.info('Item Data: '+str(item))
                 if item['id'] == eventID and item['variation_id'] == variationID:
                     customer = {'firstName': order['shipping']['first_name'], 'lastName': order['shipping']['last_name'], 'email': order['billing']['email'], 'qty': item['quantity']}
                     customers.append(customer)
@@ -72,5 +73,4 @@ def processEventCustomersForm(form):
                         customers.append(customer)
     eventDetails = {'eventID': eventID, 'eventName': form['eventName'], 'variationID': variationID, 'variationName': form['variationName'], 'totalTicketsSold': totalTicketsSold}
     data = {'eventDetails': eventDetails, 'customers': customers}
-    log.info('Customer Data: '+str(customers))
     return data

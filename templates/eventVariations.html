@@ -1,0 +1,8 @@
+{% if variations %}
+<p>{{variations[0]['attributes'][0]['name']}}: <select name="variationID" id="variationID">
+    <option>Select a {{variations[0]['attributes'][0]['name']}}</option>
+                    {%for variationData in variations%}
+<option value="{{variationData['id']}}">{{variationData['attributes'][0]['option']}}</option>
+                    {%endfor%}
+</select></p>
+{% endif %}

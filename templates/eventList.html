@@ -1,0 +1,38 @@
+<html>
+        <head>
+            {% if eventDetails['variationName' %}
+                <title>MSM Event Ticket Sales Details - {{eventDetails['eventName']}} - {{eventDetails['variationName']}}</title>
+            {% else %}
+            <title>MSM Event Ticket Sales Details - {{eventDetails['eventName']}}</title>
+            {% endif %}
+                                <style>
+                                        table, th, td {
+                                                border: 1px solid black;
+                                                border-collapse: collapse;
+                                        }
+                                        th, td {
+                                                padding: 3px;
+                                        }
+                                </style>
+        </head>
+        <body>
+            {% if eventDetails['variationName' %}
+                <h1>MSM Event Ticket Sales Details - {{eventDetails['eventName']}} - {{eventDetails['variationName']}}</h1>
+            {% else %}
+                <h1>MSM Event Ticket Sales Details - {{eventDetails['eventName']}}</h1>
+            {% endif %}
+                                <table>
+                                <tr><td><b>First Name</b></td><td><b>Last Name</b></td><td><b>Ticket Qty</b></td><td><b>Email</b></td></tr>
+                {%for customer in customers %}
+                                <tr><td>{{customer['firstName']}}</td><td>{{customer['lastName']}}</td>
+                                                <td>
+                                                        {{customer['qty']}}
+                                                </td>
+                                        <td>{{customer['email']}}</td>
+                                        {%endfor%}
+                                </tr>
+                {%endfor%}
+                                </table>
+                                <p><b>Total Tickets Sold: {{eventData['totalTicketsSold']}}</b></p>
+        </body>
+</html>

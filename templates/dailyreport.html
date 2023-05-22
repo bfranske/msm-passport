@@ -1,0 +1,310 @@
+<html>
+<head>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+.tg .tg-amounts{text-align:right;vertical-align:top}
+.tg .tg-totals{font-weight: bold;text-align:right;vertical-align:top;border-left-style:none;border-right-style:none;border-bottom-style:none;border-top-style:double;border-collapse: separate;border-width:3px}
+.tg .tg-totalAmounts{font-weight: bold;text-align:right;vertical-align:top;border-left-style:none;border-right-style:none;border-bottom-style:none;border-top-style:double;border-collapse: separate;border-width:3px}
+.column {
+  float: left;
+  width: 50%;
+}
+
+/* Clear floats after the columns */
+.incomeandexpenses:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+</style>
+</head>
+<body>
+{% for day in reportData %}
+<h1>{{day['location']}} Receipts</h1>
+<h2>{{day['date']}}</h2>
+<div class="incomeandexpenses">
+	<div class="column">
+		<h3>Income Classes</h3>
+		<table class="tg">
+		  {% set totalIncome=0.00 %}
+		  {% if day['data']['uncategorized'] > 0 %}
+		  <tr>
+			<td class="tg-0lax"></td>
+			<td class="tg-0lax">Uncategorized</td>
+			<td class="tg-0lax"></td>
+			<td class="tg-amounts">
+				{% set uncategorizedIncome=day['data']['uncategorized']/100 %}
+				{% set uncategorizedIncomeFmt='{:,.2f}'.format(uncategorizedIncome) %}
+				{% set totalIncome = totalIncome+uncategorizedIncome %}
+				${{uncategorizedIncomeFmt}}
+				</td>
+		  </tr>
+		  {% endif %}
+		  <tr>
+			<td class="tg-0lax">4120</td>
+			<td class="tg-0lax">Charters</td>
+			<td class="tg-0lax"></td>
+			<td class="tg-amounts">
+				{% if 'charters' in day['data'] %}
+					{% set charterIncome=day['data']['charters']/100 %}
+				{% else %}
+					{% set charterIncome=0.00 %}
+				{% endif %}
+				{% set charterIncomeFmt='{:,.2f}'.format(charterIncome) %}
+				{% set totalIncome = totalIncome+charterIncome %}
+				${{charterIncomeFmt}}
+				</td>
+		  </tr>
+		  <tr>
+			<td class="tg-0lax">4011</td>
+			<td class="tg-0lax">Donations</td>
+			<td class="tg-0lax"></td>
+			<td class="tg-amounts">
+				{% if 'donations' in day['data'] %}
+					{% set donationsIncome=day['data']['donations']/100 %}
+				{% else %}
+					{% set donationsIncome=0.00 %}
+				{% endif %}
+				{% set donationsIncomeFmt='{:,.2f}'.format(donationsIncome) %}
+				{% set totalIncome = totalIncome+donationsIncome %}
+				${{donationsIncomeFmt}}
+				</td>
+		  </tr>
+		  <tr>
+			<td class="tg-0lax">4111</td>
+			<td class="tg-0lax">Fares</td>
+			<td class="tg-0lax"></td>
+			<td class="tg-amounts">
+				{% if 'fares' in day['data'] %}
+					{% set faresIncome=day['data']['fares']/100 %}
+				{% else %}
+					{% set faresIncome=0.00 %}
+				{% endif %}
+				{% set faresIncomeFmt='{:,.2f}'.format(faresIncome) %}
+				{% set totalIncome = totalIncome+faresIncome %}
+				${{faresIncomeFmt}}
+				</td>
+		  </tr>
+		  <tr>
+			<td class="tg-0lax">4160</td>
+			<td class="tg-0lax">Memberships</td>
+			<td class="tg-0lax"></td>
+			<td class="tg-amounts">
+				{% if 'memberships' in day['data'] %}
+					{% set membershipsIncome=day['data']['memberships']/100 %}
+				{% else %}
+					{% set membershipsIncome=0.00 %}
+				{% endif %}
+				{% set membershipsIncomeFmt='{:,.2f}'.format(membershipsIncome) %}
+				{% set totalIncome = totalIncome+membershipsIncome %}
+				${{membershipsIncomeFmt}}
+				</td>
+		  </tr>
+		  <tr>
+			<td class="tg-0lax"></td>
+			<td class="tg-0lax">Merchandise</td>
+			<td class="tg-0lax"></td>
+			<td class="tg-0lax"></td>
+		  </tr>
+		  <tr>
+			<td class="tg-0lax">4151</td>
+			<td class="tg-0lax"></td>
+			<td class="tg-0lax">Taxable</td>
+			<td class="tg-amounts">
+				{% if 'merchandise_taxable' in day['data'] %}
+					{% set merchandise_taxableIncome=day['data']['merchandise_taxable']/100 %}
+				{% else %}
+					{% set merchandise_taxableIncome=0.00 %}
+				{% endif %}
+				{% set merchandise_taxableIncomeFmt='{:,.2f}'.format(merchandise_taxableIncome) %}
+				{% set totalIncome = totalIncome+merchandise_taxableIncome %}
+				${{merchandise_taxableIncomeFmt}}
+				</td>
+		  </tr>
+		  <tr>
+			<td class="tg-0lax">4152</td>
+			<td class="tg-0lax"></td>
+			<td class="tg-0lax">Non-Taxable</td>
+			<td class="tg-amounts">
+				{% if 'merchandise_nontaxable' in day['data'] %}
+					{% set merchandise_nontaxableIncome=day['data']['merchandise_nontaxable']/100 %}
+				{% else %}
+					{% set merchandise_nontaxableIncome=0.00 %}
+				{% endif %}
+				{% set merchandise_nontaxableIncomeFmt='{:,.2f}'.format(merchandise_nontaxableIncome) %}
+				{% set totalIncome = totalIncome+merchandise_nontaxableIncome %}
+				${{merchandise_nontaxableIncomeFmt}}
+				</td>
+		  </tr>
+		  <tr>
+			<td class="tg-0lax">4112</td>
+			<td class="tg-0lax">Passes</td>
+			<td class="tg-0lax"></td>
+			<td class="tg-amounts">
+				{% if 'passes' in day['data'] %}
+					{% set passesIncome=day['data']['passes']/100 %}
+				{% else %}
+					{% set passesIncome=0.00 %}
+				{% endif %}
+				{% set passesIncomeFmt='{:,.2f}'.format(passesIncome) %}
+				{% set totalIncome = totalIncome+passesIncome %}
+				${{passesIncomeFmt}}
+				</td>
+		  </tr>
+		  <tr>
+			<td class="tg-0lax"></td>
+			<td class="tg-0lax">Special Events</td>
+			<td class="tg-0lax"></td>
+			<td class="tg-amounts"></td>
+		  </tr>
+		  {% if 'special_events' in day['data'] %}
+			{% for event, receipts in day['data']['special_events'].items() %}
+			  <tr>
+					<td class="tg-0lax"></td>
+					<td class="tg-0lax"></td>
+					<td class="tg-0lax">{{event}}</td>
+					<td class="tg-0lax">
+						{% set eventIncome=receipts/100 %}
+						{% set eventIncomeFmt='{:,.2f}'.format(eventIncome) %}
+						{% set totalIncome = totalIncome+eventIncome %}
+						${{eventIncomeFmt}}
+						</td>
+			  </tr>
+			  {% endfor %}
+		  {% endif %}
+		  <tr>
+			<td class="tg-totals" colspan="3">Income Total</td>
+			<td class="tg-totalAmounts">
+				{% set totalIncomeFmt='{:,.2f}'.format(totalIncome) %}
+				${{totalIncomeFmt}}
+				</td>
+		  </tr>
+		</table>
+	</div>
+	<div class="column">
+		<h3>Expenses</h3>
+		{% set totalExpenses=0.00 %}
+		<table class="tg">
+		  <tr>
+			<td class="tg-0lax">Partial Refunds</td>
+			<td class="tg-amounts">
+				{% if 'partial_refunds' in day['data'] %}
+					{% set partialRefundExpense=day['data']['partial_refunds']/100 %}
+				{% else %}
+					{% set partialRefundExpense=0.00 %}
+				{% endif %}
+				{% set partialRefundExpenseFmt='{:,.2f}'.format(partialRefundExpense) %}
+				{% set totalExpenses = totalExpenses+partialRefundExpense %}
+				${{partialRefundExpenseFmt}}
+				</td>
+		  </tr>
+		  <tr>
+			<td class="tg-0lax">Credit Card Processing Fees</td>
+			<td class="tg-amounts">
+				{% if 'processing_fees' in day['data'] %}
+					{% set ccFeeAmount=day['data']['processing_fees']/100 %}
+				{% else %}
+					{% set ccFeeAmount=0.00 %}
+				{% endif %}
+				{% set ccFeeAmountFmt='{:,.2f}'.format(ccFeeAmount) %}
+				{% set totalExpenses = totalExpenses+ccFeeAmount %}
+				${{ccFeeAmountFmt}}
+				</td>
+		  </tr>
+		  <tr>
+			<td class="tg-0lax">Sales Tax Expense</td>
+			<td class="tg-amounts">
+				{% if 'tax_collected' in day['data'] %}
+					{% set taxExpense=0-(day['data']['tax_collected']/100) %}
+				{% else %}
+					{% set taxExpense=0.00 %}
+				{% endif %}
+				{% set taxExpenseFmt='{:,.2f}'.format(taxExpense) %}
+				{% set totalExpenses = totalExpenses+taxExpense %}
+				${{taxExpenseFmt}}
+				</td>
+		  </tr>
+		</table>
+	</div>
+</div>
+<hr>
+<h3>Tender Methods (Expected Deposits)</h3>
+<table class="tg">
+  <tr>
+    <td class="tg-0lax">Tender Type</td>
+	<td class="tg-0lax">Amount</td>
+	<td class="tg-0lax">Processing Fees</td>
+	<td class="tg-0lax">Net Tender</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">Cash</td>
+    <td class="tg-amounts">
+		{% if 'CASH' in day['data']['tenders'] %}
+			{% set cashAmount=day['data']['tenders']['CASH']/100 %}
+		{% else: %}
+			{% set cashAmount=0.00 %}
+		{% endif %}
+		{% set cashAmountFmt='{:,.2f}'.format(cashAmount) %}
+		${{cashAmountFmt}}
+		</td>
+    <td class="tg-amounts">$0.00</td>
+	<td class="tg-amounts">${{cashAmountFmt}}</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">Check</td>
+    <td class="tg-amounts">
+		{% if 'OTHER' in day['data']['tenders'] %}
+			{% set checkAmount=day['data']['tenders']['OTHER']/100 %}
+		{% else %}
+			{% set checkAmount=0.00 %}
+		{% endif %}
+		{% set checkAmountFmt='{:,.2f}'.format(checkAmount) %}
+		${{checkAmountFmt}}
+		</td>
+    <td class="tg-amounts">$0.00</td>
+	<td class="tg-amounts">${{checkAmountFmt}}</td>
+  </tr>
+  <tr>
+    <td class="tg-totals" colspan="3">Cash & Check Total Expected Deposit</td>
+	<td class="tg-totalAmounts">
+		{% set cashCheckAmountFmt='{:,.2f}'.format(cashAmount+checkAmount) %}
+		${{cashCheckAmountFmt}}</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">Credit Card</td>
+	{% if 'CREDIT_CARD' in day['data']['tenders'] %}
+		{% set ccAmount=day['data']['tenders']['CREDIT_CARD']/100 %}
+	{% else %}
+		{% set ccAmount=0.00 %}
+		{% set ccfeeamount=0.00 %}
+	{% endif %}
+    <td class="tg-amounts">
+		{% set ccAmountFmt='{:,.2f}'.format(ccAmount) %}
+		${{ccAmountFmt}}
+		</td>
+	<td class="tg-amounts">
+		${{ccFeeAmountFmt}}
+		</td>
+	<td class="tg-amounts">
+		{% set ccNetAmount=ccAmount+ccFeeAmount %}
+		{% set ccNetAmountFmt='{:,.2f}'.format(ccNetAmount) %}
+		${{ccNetAmountFmt}}
+		</td>
+  </tr>
+  <tr>
+    <td class="tg-totals" colspan="3">Credit Card Total Expected Deposit</td>
+	<td class="tg-totalAmounts">
+		${{ccNetAmountFmt}}</td>
+  </tr>
+</table>
+<p>
+{% set created = day['created'].astimezone(LOCAL_tzone).strftime('%Y-%m-%d %H:%M:%S') %}
+Report Calculated: {{created}}
+</p>
+<div style="page-break-after: always"></div>
+{% endfor %}}
+</body>
+</html>

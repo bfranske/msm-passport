@@ -1,0 +1,45 @@
+<html>
+        <script>
+                function getVariations() {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                                document.getElementById("event-variation").innerHTML = this.responseText;
+                        }
+                };
+                xhttp.open("POST", "{{urls['appBaseURL']}}ajax", true);
+                xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                var e = document.getElementById("eventID");
+                var eventID = e.options[e.selectedIndex].value;
+                xhttp.send("eventID="+eventID);
+                }
+                function setNames() {
+                var sel = document.getElementById("eventID");
+                var text= sel.options[sel.selectedIndex].text;
+                document.getElementById("eventName").value = text;
+                var sel = document.getElementById("variationID");
+                if (sel) {
+                var text= sel.options[sel.selectedIndex].text;
+                document.getElementById("variationName").value = text;
+                }
+                }
+        </script>
+        <head>
+                <title>MSM Event Ticket Sales Details</title>
+        </head>
+        <body>
+                <h1>MSM Event Ticket Sales Details</h1>
+                <form action="{{urls['appBaseURL']}}customers"  method="post">
+                        <p>Event: <select name="eventID" id="eventID" onchange="getVariations()">
+                                                <option>Select an Event</option>
+                                                                {%for eventData in events%}
+                                <option value="{{eventData['id']}}">{{eventData['name']}}</option>
+                                                                {%endfor%}
+                        </select></p>
+                                                <div id="event-variation"></div>
+                                                <input id="eventName" name="eventName" type="hidden">
+                                                <input id="variationName" name="variationName" type="hidden">
+                        <input type="submit" onclick="setNames()">
+                </form>
+        </body>
+</html>

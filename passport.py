@@ -5,6 +5,7 @@ from flask_session import Session  # https://pythonhosted.org/Flask-Session
 import msal
 import yaml
 import msmcharters
+import msmevents
 
 # Load configuration
 try:
@@ -75,6 +76,29 @@ def createCharterInvoice():
         return render_template('charterInvoiceCreated.html', user=session["user"], result=result)
     else:
         return render_template('charterInvoiceForm.html', user=session["user"], locations=msmcharters.getCharterLocations())
+    
+@app.route("/events/customers", methods = ['POST', 'GET'])
+def eventCustomers():
+    token = _get_token_from_cache(passportConfig['permissionScope'])
+    if not token:
+        return redirect(url_for("login"))
+    if not 'Events.ViewCustomers' in session['user']['roles']:
+        return redirect(url_for("index"))
+    if request.method == 'POST':
+        data = msmevents.processEventCustomersForm(request.form)
+        return render_template('eventList.html', eventDetails=data['eventDetails'], customers=data['customers'])
+    else:
+        return render_template('eventListForm.html', user=session["user"], events=msmevents.getEventList(), urls=msmevents.getURLs())
+    
+@app.route("/events/ajax", methods = ['POST'])
+def eventAjax():
+    token = _get_token_from_cache(passportConfig['permissionScope'])
+    if not token:
+        return redirect(url_for("login"))
+    if not 'Events.ViewCustomers' in session['user']['roles']:
+        return redirect(url_for("index"))
+    else:
+        return render_template('eventVariations.html', variations=msmevents.getVariations(request.form))
 
 def _load_cache():
     cache = msal.SerializableTokenCache()

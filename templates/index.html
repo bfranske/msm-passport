@@ -14,6 +14,9 @@
     {% if 'CharterInvoice.Create' in roles %}
       <li><a href='/charters/createInvoice'>Create Charter Invoice</a></li>
     {% endif %}
+    {% if 'Events.ViewCustomers' in roles %}
+      <li><a href='/events/customers'>View Event Customers</a></li>
+    {% endif %}
   </ul>
 </body>
 </html>

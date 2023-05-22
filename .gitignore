@@ -1,0 +1,8 @@
+config-events.yaml
+config-msmcharters.yaml
+config-msmsquare.yaml
+config-passport.yaml
+flask_session/*
+.vscode/*
+__pycache__/*
+ms-identity-python-webapp-master.zip

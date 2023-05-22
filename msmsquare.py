@@ -3,12 +3,12 @@
 import requests
 from collections import defaultdict
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.dialects.postgresql.json import JSONB
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, date, time, timezone
 from dateutil import tz
 from pprint import pprint
 import logging
@@ -81,6 +81,7 @@ class Catalog(base):
     id = Column(Integer, primary_key=True)
     catalog_id = Column(String)
     type = Column(String)
+    version = Column(String)
     is_deleted = Column(Boolean)
     lastSyncDate = Column(DateTime(timezone=True))
     data = Column(JSONB)
@@ -106,6 +107,17 @@ class PayoutEntries(base):
     effective_at = Column(DateTime(timezone=True))
     lastSyncDate = Column(DateTime(timezone=True))
     data = Column(JSONB)
+
+class DailyReport(base):  
+	# Create an ORM class for holding the Daily Report data in JSONB format
+	__tablename__ = 'dailyReports'
+	id = Column(Integer, primary_key=True)
+	location_id = Column(String)
+	location_name = Column(String)
+	reportCreationDate = Column(DateTime(timezone=True))
+	reportStartDate = Column(DateTime(timezone=True))
+	reportEndDate = Column(DateTime(timezone=True))
+	data = Column(JSONB)
 
 def getLocationsFromSquare(db_session, headers):
     #Get a current list of locations from Square and store in the local database, update any existing records too
@@ -137,22 +149,30 @@ def getLocations(db_session, headers):
         locations.append(location.data)
     return locations
 
+def getLocationByID(locationID, db_session, headers):
+    locationInDB = db_session.query(Location).filter(Location.location_id==locationID).one()
+    location = {'location_id':locationInDB.location_id, 'name':locationInDB.name}
+    return location
+
+
 def savePaymentInDB(payment, db_session, headers):
     # Takes in a payment dict, if the payment ID exists in the database it is updated, if not it is added
     try:
         paymentInDB = db_session.query(Payment).filter(Payment.data.contains({'id': payment['id']})).one()
         # Yes, it's already in the DB so we should update the DB with the passed payment dict
+        logging.debug('Payment Found in DB, updating: %s', payment['id'])
         paymentInDB.data = payment
         paymentInDB.location_id = payment['location_id']
         paymentInDB.order_id = payment['order_id']
         paymentInDB.payment_id = payment['id']
         paymentInDB.created_at = payment['created_at']
-        paymentInDB.updated_at = payment['updated_at']
+        paymentInDB.updated_at = payment.get('updated_at')
         paymentInDB.lastSyncDate = datetime.now(timezone.utc)
         db_session.commit()
     except NoResultFound:
         # The payment ID is not in the database yet, add the passed payment dict to the database
-        db_payment = Payment(data=payment,payment_id=payment['id'],order_id=payment['order_id'],location_id=payment['location_id'],created_at = payment['created_at'],updated_at = payment['updated_at'],lastSyncDate = datetime.now(timezone.utc))
+        logging.debug('Payment NOT Found in DB, adding: %s', payment['id'])
+        db_payment = Payment(data=payment,payment_id=payment['id'],order_id=payment['order_id'],location_id=payment['location_id'],created_at=payment['created_at'],updated_at=payment.get('updated_at'),lastSyncDate = datetime.now(timezone.utc))
         db_session.add(db_payment)
         db_session.commit()
     except MultipleResultsFound:
@@ -170,12 +190,12 @@ def saveRefundInDB(refund, db_session, headers):
         refundInDB.payment_id = refund['payment_id']
         refundInDB.refund_id = refund['id']
         refundInDB.created_at = refund['created_at']
-        refundInDB.updated_at = refund['updated_at']
+        refundInDB.updated_at = refund.get('updated_at')
         refundInDB.lastSyncDate = datetime.now(timezone.utc)
         db_session.commit()
     except NoResultFound:
         # The refund ID is not in the database yet, add the passed refund dict to the database
-        db_refund = Refund(data=refund,refund_id=refund['id'],payment_id=refund['payment_id'],order_id=refund['order_id'],location_id=refund['location_id'],created_at = refund['created_at'],updated_at = refund['updated_at'],lastSyncDate = datetime.now(timezone.utc))
+        db_refund = Refund(data=refund,refund_id=refund['id'],payment_id=refund['payment_id'],order_id=refund['order_id'],location_id=refund['location_id'],created_at = refund['created_at'],updated_at = refund.get('updated_at'),lastSyncDate = datetime.now(timezone.utc))
         db_session.add(db_refund)
         db_session.commit()
     except MultipleResultsFound:
@@ -191,12 +211,12 @@ def savePayoutInDB(payout, db_session, headers):
         payoutInDB.location_id = payout['location_id']
         payoutInDB.payout_id = payout['id']
         payoutInDB.created_at = payout['created_at']
-        payoutInDB.updated_at = payout['updated_at']
+        payoutInDB.updated_at = payout.get('updated_at')
         payoutInDB.lastSyncDate = datetime.now(timezone.utc)
         db_session.commit()
     except NoResultFound:
         # The payout ID is not in the database yet, add the passed payout dict to the database
-        db_payout = Payout(data=payout,payout_id=payout['id'],location_id=payout['location_id'],created_at = payout['created_at'],updated_at = payout['updated_at'],lastSyncDate = datetime.now(timezone.utc))
+        db_payout = Payout(data=payout,payout_id=payout['id'],location_id=payout['location_id'],created_at = payout['created_at'],updated_at = payout.get('updated_at'),lastSyncDate = datetime.now(timezone.utc))
         db_session.add(db_payout)
         db_session.commit()
     except MultipleResultsFound:
@@ -232,12 +252,12 @@ def saveOrderInDB(order, db_session, headers):
         orderInDB.data = order
         orderInDB.location_id = order['location_id']
         orderInDB.created_at = order['created_at']
-        orderInDB.updated_at = order['updated_at']
+        orderInDB.updated_at = order.get('updated_at')
         orderInDB.lastSyncDate = datetime.now(timezone.utc)
         db_session.commit()
     except NoResultFound:
         # The payment ID is not in the database yet, add the passed payment dict to the database
-        db_order = Order(data=order,order_id=order['id'],location_id=order['location_id'],created_at = order['created_at'],updated_at = order['updated_at'],lastSyncDate = datetime.now(timezone.utc))
+        db_order = Order(data=order,order_id=order['id'],location_id=order['location_id'],created_at = order['created_at'],updated_at = order.get('updated_at'),lastSyncDate = datetime.now(timezone.utc))
         db_session.add(db_order)
         db_session.commit()
     except MultipleResultsFound:
@@ -249,7 +269,7 @@ def getPayment(paymentID, db_session, headers):
     # Try getting the payment from the database first
     try:
         payment = db_session.query(Payment).filter(Payment.data.contains({'id': paymentID})).one()
-        print ("Payment Found in Local DB: {}".format(paymentID))
+        logging.debug('Payment Found in Local DB: %s',paymentID)
         return payment.data
     except NoResultFound:
         r = requests.get('https://connect.squareup.com/v2/payments/'+paymentID, headers=headers)
@@ -271,8 +291,8 @@ def getPaymentsByDateRangeFromSquare(startTime, stopTime, locationID, db_session
         payments = response['payments']
         while True:
             for payment in payments:
-                logging.info('Processing Payment: %s', payment['id'])
-                logging.info(' Payment Date: %s', payment['created_at'])
+                logging.debug('Processing Payment: %s', payment['id'])
+                logging.debug(' Payment Date: %s', payment['created_at'])
                 savePaymentInDB(payment, db_session, headers)
                 paymentList.append(payment['id'])
             # Check to see if the list of payments from Square has been paginated
@@ -290,6 +310,101 @@ def getPaymentsByDateRangeFromSquare(startTime, stopTime, locationID, db_session
         pass
     return paymentList
 
+def getPaymentsAndOrdersByDateRange(startTime, stopTime, locationID, db_session, headers):
+    #Get all of the payment and associated order IDs between two dates for a given location
+    paymentsAndOrders = []
+    try:
+        paymentsInDB = db_session.query(Payment).filter(Payment.location_id == locationID, Payment.created_at >= startTime, Payment.created_at < stopTime).all()
+        for payment in paymentsInDB:
+            logging.debug('Processing Payment: %s', payment.payment_id)
+            logging.debug(' Payment Date: %s', payment.created_at)
+            if payment.data['status'] == 'FAILED' or payment.data['status'] == 'CANCELED':
+                #do not include failed or cancelled payments in the payments and orders, sometimes they have orderids which don't really exist
+                pass
+            else:
+                paymentsAndOrders.append({'paymentID': payment.payment_id, 'orderID': payment.order_id})
+        return paymentsAndOrders
+    except:
+        return
+
+def getLineItemsFromOrder(orderID, db_session, headers):
+    try:
+        orderInDB = db_session.query(Order).filter(Order.order_id == orderID).one()
+        orderData = orderInDB.data
+        if not 'line_items' in orderData:
+            logging.debug('No line items in Order: %s', orderID)
+            return -1
+        return orderData['line_items']
+    except NoResultFound:
+        logging.debug('Order NOT Found in DB: %s', orderID)
+    except MultipleResultsFound:
+        raise Exception('Multiple Orders Found in Database with Order ID: {}'.format(orderID))
+    return
+
+def getReturnedLineItemsFromOrder(orderID, db_session, headers):
+    lineItems = []
+    try:
+        orderInDB = db_session.query(Order).filter(Order.order_id == orderID).one()
+        orderData = orderInDB.data
+        for ireturn in orderData['returns']:
+            for item in ireturn['return_line_items']:
+                lineItems.append(item)
+    except NoResultFound:
+        logging.debug('Order NOT Found in DB: %s', orderID)
+    except MultipleResultsFound:
+        raise Exception('Multiple Orders Found in Database with Order ID: {}'.format(orderID))
+    return lineItems
+
+def getCategoryForObject(objectID, catalogVersion, db_session, headers):
+    # Returns the category ID and category name of an item or item variation
+    # Try from local first
+    try:
+        objectInDB = db_session.query(Catalog).filter(Catalog.catalog_id == objectID).one()
+        catalogData = objectInDB.data
+        if catalogData['type'] == 'ITEM_VARIATION':
+            category = getCategoryForObject(catalogData['item_variation_data']['item_id'], catalogVersion, db_session, headers)
+            return category
+        elif catalogData['type'] == 'ITEM':
+            if not 'category_id' in catalogData['item_data']:
+                category = {'categoryID': -1}
+                return category
+            else:
+                categoryID = catalogData['item_data']['category_id']
+        else:
+            logging.debug('ITEM or ITEM VARIATION not returned for Object ID: %s', objectID)
+            return
+    except NoResultFound:
+        r = requests.get('https://connect.squareup.com/v2/catalog/object/'+objectID+'?catalog_version='+str(catalogVersion), headers=headers)
+        response = r.json()
+        object = response['object']
+        saveCatalogObjectInDB(object, db_session, headers)
+        logging.debug('Object Added to Local DB: %s', objectID)
+        if object['type'] == 'ITEM_VARIATION':
+            category = getCategoryForObject(object['item_variation_data']['item_id'], catalogVersion, db_session, headers)
+            return category
+        elif object['type'] == 'ITEM':
+            if not 'category_id' in object['item_data']:
+                category = {'categoryID': -1}
+                return category
+            else:
+                categoryID = object['item_data']['category_id']
+
+    except MultipleResultsFound:
+        raise Exception('Multiple Objects Found in Database with Object ID: {}'.format(objectID))
+        return
+    #Get category name too
+    try:
+        categoryInDB = db_session.query(Catalog).filter(Catalog.catalog_id == categoryID).one()
+        categoryName = categoryInDB.data['category_data']['name']
+    except NoResultFound:
+        print('No category for: '+categoryID)
+        r = requests.get('https://connect.squareup.com/v2/catalog/object/'+categoryID+'?catalog_version='+str(catalogVersion), headers=headers)
+        response = r.json()
+        saveCatalogObjectInDB(object, db_session, headers)
+        categoryName = response['category_data']['name']
+    category = {'categoryID': categoryID, 'categoryName': categoryName}
+    return category
+
 def getOrdersByDateRangeFromSquare(startTime, stopTime, locationID, db_session, headers):
     #Get all of the orders that Square has between two dates for a given location
     orderList = []
@@ -300,7 +415,7 @@ def getOrdersByDateRangeFromSquare(startTime, stopTime, locationID, db_session, 
         orders = response['orders']
         while True:
             for order in orders:
-                logging.info('Processing Order: %s', order['id'])
+                logging.debug('Processing Order: %s', order['id'])
                 saveOrderInDB(order, db_session, headers)
                 orderList.append(order['id'])
             # Check to see if the list of orders from Square has been paginated
@@ -319,6 +434,24 @@ def getOrdersByDateRangeFromSquare(startTime, stopTime, locationID, db_session, 
         pass
     return orderList
 
+def getOrder(orderID, db_session, headers):
+    # Check the local cache to see if we have that order data. If yes, return it. If no, get it from square, store it in the local cache, and then return it.
+    # Try getting the order from the database first
+    try:
+        refund = db_session.query(Order).filter(Order.data.contains({'id': orderID})).one()
+        print ("Order Found in Local DB: {}".format(orderID))
+        return refund.data
+    except NoResultFound:
+        r = requests.get('https://connect.squareup.com/v2/orders/'+orderID, headers=headers)
+        response = r.json()
+        order = response['order']
+        saveOrderInDB(order, db_session, headers)
+        #print ("Order Added to Local DB: {}".format(orderID))
+        return order
+    except MultipleResultsFound:
+        raise Exception('Multiple Orders Found in Database with Order ID: {}'.format(orderID))
+        return
+
 def getCatalogFromSquare(db_session, headers):
     #Get a current full catalog from Square and store in the local database, update any existing records too
     catalog=[]
@@ -328,23 +461,8 @@ def getCatalogFromSquare(db_session, headers):
         catalogObjects = response['objects']
         while True:
             for catalogObject in catalogObjects:
-                try:
-                    objectInDB = db_session.query(Catalog).filter(Catalog.data.contains({'id': catalogObject['id']})).one()
-                    # Yes, it's already in the DB so we should update the DB with the passed object dict
-                    objectInDB.data = catalogObject
-                    objectInDB.type = catalogObject['type']
-                    objectInDB.is_deleted = catalogObject['is_deleted']
-                    objectInDB.lastSyncDate = datetime.now(timezone.utc)
-                    db_session.commit()
-                    catalog.append(catalogObject)
-                except NoResultFound:
-                    # The object ID is not in the database yet, add the passed object dict to the database
-                    db_catalog = Catalog(data=catalogObject,catalog_id=catalogObject['id'],type=catalogObject['type'],is_deleted=catalogObject['is_deleted'],lastSyncDate = datetime.now(timezone.utc))
-                    db_session.add(db_catalog)
-                    db_session.commit()
-                    catalog.append(catalogObject)
-                except MultipleResultsFound:
-                    raise Exception('Multiple Catalog Objects Found in Database with Object ID: {}'.format(catalogObject['id']))
+                saveCatalogObjectInDB(catalogObject, db_session, headers)
+                catalog.append(catalogObject)
             # Check to see if the list of objects from Square has been paginated
             try:
                 cursor = response['cursor']
@@ -360,6 +478,26 @@ def getCatalogFromSquare(db_session, headers):
         pass
     return catalog
 
+def saveCatalogObjectInDB(catalogObject, db_session, headers):
+    # Takes in an object dict, if the object ID exists in the database it is updated, if not it is added
+    try:
+        objectInDB = db_session.query(Catalog).filter(Catalog.data.contains({'id': catalogObject['id']})).one()
+        # Yes, it's already in the DB so we should update the DB with the passed object dict
+        objectInDB.data = catalogObject
+        objectInDB.type = catalogObject['type']
+        objectInDB.version = catalogObject['version']
+        objectInDB.is_deleted = catalogObject['is_deleted']
+        objectInDB.lastSyncDate = datetime.now(timezone.utc)
+        db_session.commit()
+    except NoResultFound:
+        # The object ID is not in the database yet, add the passed object dict to the database
+        db_catalog = Catalog(data=catalogObject,catalog_id=catalogObject['id'],type=catalogObject['type'],is_deleted=catalogObject['is_deleted'],lastSyncDate = datetime.now(timezone.utc))
+        db_session.add(db_catalog)
+        db_session.commit()
+    except MultipleResultsFound:
+        raise Exception('Multiple Catalog Objects Found in Database with Catalog Object ID: {}'.format(catalogObject['id']))
+    return
+
 def getRefundsByDateRangeFromSquare(startTime, stopTime, locationID, db_session, headers):
     #Get all of the refunds that Square has between two dates for a given location
     refundList = []
@@ -369,8 +507,8 @@ def getRefundsByDateRangeFromSquare(startTime, stopTime, locationID, db_session,
         refunds = response['refunds']
         while True:
             for refund in refunds:
-                logging.info('Processing Refund: %s', refund['id'])
-                logging.info(' Refund Date: %s', refund['created_at'])
+                logging.debug('Processing Refund: %s', refund['id'])
+                logging.debug(' Refund Date: %s', refund['created_at'])
                 saveRefundInDB(refund, db_session, headers)
                 refundList.append(refund['id'])
             # Check to see if the list of refunds from Square has been paginated
@@ -388,6 +526,32 @@ def getRefundsByDateRangeFromSquare(startTime, stopTime, locationID, db_session,
         pass
     return refundList
 
+def getRefundsByDateRange(startTime, stopTime, locationID, db_session, headers):
+    #Get all of the refund, payment, and associated order IDs between two dates for a given location
+    refunds = []
+    refundsInDB = db_session.query(Refund).filter(Refund.location_id == locationID, Refund.created_at >= startTime, Refund.created_at < stopTime ).all()
+    for refund in refundsInDB:
+        refunds.append({'refundID': refund.refund_id, 'paymentID': refund.payment_id,'orderID': refund.order_id})
+    return refunds
+
+def getRefund(refundID, db_session, headers):
+    # Check the local cache to see if we have that refund data. If yes, return it. If no, get it from square, store it in the local cache, and then return it.
+    # Try getting the refund from the database first
+    try:
+        refund = db_session.query(Refund).filter(Refund.data.contains({'id': refundID})).one()
+        logging.debug('Refund Found in Local DB: %s',refundID)
+        return refund.data
+    except NoResultFound:
+        r = requests.get('https://connect.squareup.com/v2/refunds/'+refundID, headers=headers)
+        response = r.json()
+        refund = response['refund']
+        saveRefundInDB(refund, db_session, headers)
+        #print ("Refund Added to Local DB: {}".format(refundID))
+        return refund
+    except MultipleResultsFound:
+        raise Exception('Multiple Refunds Found in Database with Refund ID: {}'.format(refundID))
+        return
+
 def getPayoutsByDateRangeFromSquare(startTime, stopTime, locationID, db_session, headers):
     #Get all of the payouts that Square has between two dates for a given location
     payoutList = []
@@ -397,8 +561,8 @@ def getPayoutsByDateRangeFromSquare(startTime, stopTime, locationID, db_session,
         payouts = response['payouts']
         while True:
             for payout in payouts:
-                logging.info('Processing Payout: %s', payout['id'])
-                logging.info(' Payout Date: %s', payout['created_at'])
+                logging.debug('Processing Payout: %s', payout['id'])
+                logging.debug(' Payout Date: %s', payout['created_at'])
                 savePayoutInDB(payout, db_session, headers)
                 payoutList.append(payout['id'])
             # Check to see if the list of payouts from Square has been paginated
@@ -428,8 +592,8 @@ def getPayoutEntriesByDateRangeFromSquare(startTime, stopTime, locationID, db_se
             payoutEntries = response['payout_entries']
             while True:
                 for payoutEntry in payoutEntries:
-                    logging.info('Processing Payout Entry: %s', payoutEntry['id'])
-                    logging.info(' Payout Entry Effective Date: %s', payoutEntry['effective_at'])
+                    logging.debug('Processing Payout Entry: %s', payoutEntry['id'])
+                    logging.debug(' Payout Entry Effective Date: %s', payoutEntry['effective_at'])
                     savePayoutEntryInDB(payoutEntry, db_session, headers)
                     payoutEntryList.append(payoutEntry['id'])
                 # Check to see if the list of payout entries from Square has been paginated
@@ -447,3 +611,221 @@ def getPayoutEntriesByDateRangeFromSquare(startTime, stopTime, locationID, db_se
             pass
     return payoutEntryList
 
+def combineIntoDefaultDict(d, new_d):
+	# When passed a default dict and a second dict, sum the values of the second dict into the default dict
+	for k, v in new_d.items():
+		if isinstance(v, dict):
+			combineIntoDefaultDict(d[k], v)
+		else: 
+			d[k] = d.setdefault(k, 0) + v
+
+def default_dict_to_regular(d):
+	# Take a defaultdict and convert it to a regular dict including nested default dicts
+	if isinstance(d, defaultdict):
+		d = {k: default_dict_to_regular(v) for k, v in d.items()}
+	return d
+
+def sumDicts(listToProcess):
+	# Takes a list of dicts and sums the values by each key, returning a single dict, works with nested dicts too
+	nested = lambda: defaultdict(nested)
+	d = nested()
+	for subd in listToProcess:
+		combineIntoDefaultDict(d, subd)
+	return default_dict_to_regular(d)
+
+def summaryFinancialsForPurchase(paymentsAndOrders, locationID, db_session, headers):
+    # Return financial statistics for a given order
+    finStats = {
+		'fares': 0,
+		'passes': 0,
+		'donations': 0,
+		'charters': 0,
+		'merchandise_taxable': 0,
+		'merchandise_nontaxable': 0,
+		'uncategorized': 0,
+		'memberships': 0,
+		'tax_collected': 0,
+		'processing_fees':0,
+        'online_sales':0,
+		'special_events': {},
+		'tenders': {}
+		}
+    special_events = []
+    tenders = []
+    # get list of line items from the order
+    lineItems = getLineItemsFromOrder(paymentsAndOrders['orderID'], db_session, headers)
+    if lineItems == -1:
+        #No line items in the order (could be a NO SALE for instance)
+        return finStats
+    else:
+        for item in lineItems:
+            if locationID == 'LBR2E5T341WDH':
+                # Webstore sale, put all in online category
+                finStats['online_sales'] += item['total_money']['amount']
+            # Custom Amount items have no catalog object id, they should be treated as uncategorized
+            elif not 'catalog_object_id' in item:
+                if item['item_type'] == 'CUSTOM_AMOUNT':
+                    finStats['uncategorized'] += item['total_money']['amount']
+            else:
+                # get category name for each item
+                category = getCategoryForObject(item['catalog_object_id'], item['catalog_version'], db_session, headers)
+                if not 'categoryName' in category:
+                    finStats['uncategorized'] += item['total_money']['amount']
+                elif category['categoryName'] == 'Special Events':
+                    special_events.append({item['name']:item['total_money']['amount']})
+                elif category['categoryName'] == 'Fares':
+                    finStats['fares'] += item['total_money']['amount']
+                elif category['categoryName'] == 'Passes':
+                    finStats['passes'] += item['total_money']['amount']
+                elif category['categoryName'] == 'Donations':
+                    finStats['donations'] += item['total_money']['amount']
+                elif category['categoryName'] == 'Charters':
+                    finStats['charters'] += item['total_money']['amount']
+                elif category['categoryName'] == 'Membership':
+                    finStats['memberships'] += item['total_money']['amount']
+                else:
+                    if item['total_tax_money']['amount'] == 0:
+                        finStats['merchandise_nontaxable'] += item['total_money']['amount']
+                    else:
+                        finStats['merchandise_taxable'] += item['total_money']['amount']
+            finStats['tax_collected'] += item['total_tax_money']['amount']
+        finStats['special_events'] = sumDicts(special_events)
+        payment = getPayment(paymentsAndOrders['paymentID'], db_session, headers)
+        tenders.append({payment['source_type']:payment['total_money']['amount']})
+        finStats['tenders'] = sumDicts(tenders)
+        if 'processing_fee' in payment:
+            #skip if there is no fee line in the payment, eg cash sale
+            for fee in payment['processing_fee']:
+                finStats['processing_fees'] += fee['amount_money']['amount']
+        return finStats
+
+def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
+    # Return financial statistics for a given refund
+    finStats = {
+		'fares': 0,
+		'passes': 0,
+		'donations': 0,
+		'charters': 0,
+		'merchandise_taxable': 0,
+		'merchandise_nontaxable': 0,
+		'uncategorized': 0,
+		'memberships': 0,
+		'tax_collected': 0,
+		'processing_fees':0,
+        'online_sales':0,
+		'special_events': {},
+		'tenders': {}
+		}
+    special_events = []
+    tenders = []
+    lineItems = getReturnedLineItemsFromOrder(refundIDs['orderID'], db_session, headers)
+    for item in lineItems:
+        if locationID == 'LBR2E5T341WDH':
+                # Webstore sale, put all in online category
+                finStats['online_sales'] += 0-item['total_money']['amount']
+        elif not 'catalog_object_id' in item:
+                if item['item_type'] == 'CUSTOM_AMOUNT':
+                    finStats['uncategorized'] += 0-item['total_money']['amount']
+        else:
+            # get category name for each item
+            category = getCategoryForObject(item['catalog_object_id'], item['catalog_version'], db_session, headers)
+            if not 'categoryName' in category:
+                finStats['uncategorized'] += 0-item['total_money']['amount']
+            elif category['categoryName'] == 'Special Events':
+                if item['variation_name']:
+                    special_events.append({item['variation_name']:0-item['total_money']['amount']})
+                else:
+                    special_events.append({item['name']:0-item['total_money']['amount']})
+            elif category['categoryName'] == 'Fares':
+                finStats['fares'] += 0-item['total_money']['amount']
+            elif category['categoryName'] == 'Passes':
+                finStats['passes'] += 0-item['total_money']['amount']
+            elif category['categoryName'] == 'Donations':
+                finStats['donations'] += 0-item['total_money']['amount']
+            elif category['categoryName'] == 'Charters':
+                finStats['charters'] += 0-item['total_money']['amount']
+            elif category['categoryName'] == 'Membership':
+                finStats['memberships'] += 0-item['total_money']['amount']
+            else:
+                if item['total_tax_money']['amount'] == 0:
+                    finStats['merchandise_nontaxable'] += 0-item['total_money']['amount']
+                else:
+                    finStats['merchandise_taxable'] += 0-item['total_money']['amount']
+        finStats['tax_collected'] += 0-item['total_tax_money']['amount']
+    finStats['special_events'] = sumDicts(special_events)
+    refund = getRefund(refundIDs['refundID'], db_session, headers) 
+    if 'processing_fee' in refund:
+        # square used to refund the processing fees too
+        for fee in refund['processing_fee']:
+            finStats['processing_fees'] += fee['amount_money']['amount']
+    tenders.append({refund['destination_type']:0-refund['amount_money']['amount']})
+    finStats['tenders'] = sumDicts(tenders)
+    return finStats
+
+def generateSummaryStatsForDateRange(beginTime,endTime,locationID,db_session, headers):
+    location=getLocationByID(locationID,db_session,headers)
+    # Get list of orderIDs in the date range
+    paymentsAndOrders = getPaymentsAndOrdersByDateRange(beginTime, endTime, locationID, db_session, headers)
+    summaries = []
+    for paymentAndOrder in paymentsAndOrders:
+	    # get summary statistics for the order
+        summaries.append(summaryFinancialsForPurchase(paymentAndOrder, locationID, db_session, headers))
+    chargeSummaries = sumDicts(summaries)
+    summaries = []
+    refunds = getRefundsByDateRange(beginTime, endTime, locationID, db_session, headers)
+    for refund in refunds:
+        summaries.append(summaryFinancialsForRefund(refund, locationID, db_session, headers))
+    refundSummaries = sumDicts(summaries)
+    totalSummaries = sumDicts([chargeSummaries,refundSummaries])
+    try:
+        reportInDB = db_session.query(DailyReport).filter(DailyReport.reportStartDate==beginTime, DailyReport.reportEndDate==endTime, DailyReport.location_id==locationID).one()
+        # Yes, it's already in the DB so we should update the DB with the passed report data
+        reportInDB.data = totalSummaries
+        reportInDB.location_id = locationID
+        reportInDB.location_name = location['name']
+        reportInDB.reportCreationDate = datetime.now(timezone.utc)
+        reportInDB.reportStartDate = beginTime
+        reportInDB.reportEndDate = endTime
+        db_session.commit()
+    except NoResultFound:
+        # The daily report is not in the database yet, add the passed report dict to the database if it's not empty
+        if totalSummaries:
+            db_report = DailyReport(data=totalSummaries,location_id=locationID,location_name=location['name'],reportCreationDate=datetime.now(timezone.utc),reportStartDate=beginTime,reportEndDate=endTime)
+            db_session.add(db_report)
+            db_session.commit()
+    except MultipleResultsFound:
+        raise Exception('Multiple Daily Reports Found in Database with same location and start/end date')
+    return totalSummaries
+
+def generateReportDataForDates(beginDate,endDate, locationID,db_session, headers):
+    UTC_tzone = tz.gettz('UTC')
+    LOCAL_tzone = tz.gettz(msmSquareConfig['localTimezone'])
+    deltaDays = endDate-beginDate
+    for i in range(deltaDays.days + 1):
+        date = beginDate + timedelta(days=i)
+        newDayTime = time(3,0,0,tzinfo=LOCAL_tzone)
+        beginTime=datetime.combine(date, newDayTime)
+        spelledDate = beginTime.astimezone(LOCAL_tzone).strftime('%A %B %-d, %Y')
+        beginTimeTZ = beginTime.astimezone(LOCAL_tzone)
+        endTime=beginTime+timedelta(days=1)
+        endTimeTZ = endTime.astimezone(LOCAL_tzone)
+        endTime=endTime.astimezone(UTC_tzone).strftime('%Y-%m-%dT%H:%M:%SZ')
+        beginTime=beginTime.astimezone(UTC_tzone).strftime('%Y-%m-%dT%H:%M:%SZ')
+        logging.info('Generating Report for: %s for Location %s', spelledDate, locationID)
+        generateSummaryStatsForDateRange(beginTime,endTime,locationID,db_session, headers)
+    return
+
+def getReportDataForDatesFromDBAllLocations(beginDate,endDate, db_session, headers):
+    UTC_tzone = tz.gettz('UTC')
+    LOCAL_tzone = tz.gettz(msmSquareConfig['localTimezone'])
+    reportData = []
+    newDayTime = time(3,0,0,tzinfo=LOCAL_tzone)
+    beginTime = datetime.combine(beginDate, newDayTime)
+    beginTimeTZ = beginTime.astimezone(LOCAL_tzone)
+    endTime = datetime.combine(endDate, newDayTime)
+    endTimeTZ = endTime.astimezone(LOCAL_tzone)
+    reportsInDB = db_session.query(DailyReport).filter(DailyReport.reportStartDate.between(beginTimeTZ,endTimeTZ)).order_by(DailyReport.location_name,DailyReport.reportStartDate).all()
+    for report in reportsInDB:
+        spelledDate = report.reportStartDate.strftime('%A %B %-d, %Y')
+        reportData.append({'location':report.location_name, 'date': spelledDate, 'created': report.reportCreationDate, 'data': report.data})
+    return reportData

@@ -30,14 +30,14 @@ def getURLs():
 
 def getVariations(form):
     eventID = form['eventID']
-    r = requests.get(eventsConfig['wcBaseURL']+'products/'+eventID+'/variations?per_page=100', auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
+    r = requests.get(eventsConfig['wcBaseURL']+'products/'+str(eventID)+'/variations?per_page=100', auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
     variations = r.json()
     return variations
 
 def processEventCustomersForm(form):
     eventID = int(form['eventID'])
     variationID = int(form['variationID'])
-    r = requests.get(eventsConfig['wcBaseURL']+'orders?product='+eventID+'&per_page=500', auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
+    r = requests.get(eventsConfig['wcBaseURL']+'orders?product='+str(eventID)+'&per_page=500', auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
     orders = r.json()
     totalTicketsSold=0
     customers = []

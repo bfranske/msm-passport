@@ -20,7 +20,7 @@ except IOError:
 #eventsConfig['wcCategoryID']
 
 def getEventList():
-    r = requests.get(eventsConfig['wcBaseURL']+'products?category='+eventsConfig['wcCategoryID']+'per_page=100&orderby=date', auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
+    r = requests.get(eventsConfig['wcBaseURL']+'products?category='+str(eventsConfig['wcCategoryID'])+'per_page=100&orderby=date', auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
     events = r.json()
     return events
 

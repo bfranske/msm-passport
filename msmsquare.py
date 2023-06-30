@@ -691,12 +691,15 @@ def summaryFinancialsForPurchase(paymentsAndOrders, locationID, db_session, head
             finStats['tax_collected'] += item['total_tax_money']['amount']
         finStats['special_events'] = sumDicts(special_events)
         payment = getPayment(paymentsAndOrders['paymentID'], db_session, headers)
-        tenders.append({payment['source_type']:payment['total_money']['amount']})
+        if payment['source_type'] != 'EXTERNAL':
+            tenders.append({payment['source_type']:payment['total_money']['amount']})
+        elif payment['external_details']['type'] == 'CHECK':
+            tenders.append({'CHECK':payment['total_money']['amount']})
         finStats['tenders'] = sumDicts(tenders)
         if 'processing_fee' in payment:
             #skip if there is no fee line in the payment, eg cash sale
             for fee in payment['processing_fee']:
-                finStats['processing_fees'] += fee['amount_money']['amount']
+                finStats['processing_fees'] += 0-fee['amount_money']['amount']
         return finStats
 
 def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):

@@ -34,8 +34,8 @@ db_session = msmsquare.Session() # create a working database session for version
 #Ensure all the required tables exist in the database
 msmsquare.base.metadata.create_all(msmsquare.db)
 
-beginDate=date(2023,4,1)
-endDate=date(2023,4,30)
+beginDate=date(2023,5,1)
+endDate=date(2023,5,31)
 locationID='M225NFD7TJ8ZJ' #CHSL
 #locationID='5RT3Z6SAPGQB7' #ESL
 #locationID='8CY2M680JGBJE' #MSM

@@ -43,6 +43,19 @@
 				</td>
 		  </tr>
 		  {% endif %}
+		  {% if day['data']['online_sales'] > 0 %}
+		  <tr>
+			<td class="tg-0lax"></td>
+			<td class="tg-0lax">Online Sales</td>
+			<td class="tg-0lax"></td>
+			<td class="tg-amounts">
+				{% set onlineIncome=day['data']['online_sales']/100 %}
+				{% set onlineIncomeFmt='{:,.2f}'.format(onlineIncome) %}
+				{% set totalIncome = totalIncome+onlineIncome %}
+				${{onlineIncomeFmt}}
+				</td>
+		  </tr>
+		  {% endif %}
 		  <tr>
 			<td class="tg-0lax">4120</td>
 			<td class="tg-0lax">Charters</td>
@@ -161,6 +174,7 @@
 			<td class="tg-amounts"></td>
 		  </tr>
 		  {% if 'special_events' in day['data'] %}
+		    {% set ti={'totalIncome':totalIncome} %}
 			{% for event, receipts in day['data']['special_events'].items() %}
 			  <tr>
 					<td class="tg-0lax"></td>
@@ -169,11 +183,12 @@
 					<td class="tg-0lax">
 						{% set eventIncome=receipts/100 %}
 						{% set eventIncomeFmt='{:,.2f}'.format(eventIncome) %}
-						{% set totalIncome = totalIncome+eventIncome %}
+						{% set _ = ti.update({'totalIncome':ti['totalIncome']+eventIncome}) %}
 						${{eventIncomeFmt}}
 						</td>
 			  </tr>
 			  {% endfor %}
+			{% set totalIncome = ti['totalIncome'] %}
 		  {% endif %}
 		  <tr>
 			<td class="tg-totals" colspan="3">Income Total</td>
@@ -256,8 +271,8 @@
   <tr>
     <td class="tg-0lax">Check</td>
     <td class="tg-amounts">
-		{% if 'OTHER' in day['data']['tenders'] %}
-			{% set checkAmount=day['data']['tenders']['OTHER']/100 %}
+		{% if 'CHECK' in day['data']['tenders'] %}
+			{% set checkAmount=day['data']['tenders']['CHECK']/100 %}
 		{% else %}
 			{% set checkAmount=0.00 %}
 		{% endif %}
@@ -274,14 +289,17 @@
 		${{cashCheckAmountFmt}}</td>
   </tr>
   <tr>
-    <td class="tg-0lax">Credit Card</td>
-	{% if 'CREDIT_CARD' in day['data']['tenders'] %}
-		{% set ccAmount=day['data']['tenders']['CREDIT_CARD']/100 %}
+    <td class="tg-0lax">Credit Card/eWallet</td>
+	{% if 'CARD' in day['data']['tenders'] %}
+		{% set ccAmount=day['data']['tenders']['CARD']/100 %}
 	{% else %}
 		{% set ccAmount=0.00 %}
 		{% set ccfeeamount=0.00 %}
 	{% endif %}
     <td class="tg-amounts">
+		{% if 'WALLET' in day['data']['tenders'] %}
+		{% set ccAmount = ccAmount + (day['data']['tenders']['WALLET']/100) %}
+		{% endif %}
 		{% set ccAmountFmt='{:,.2f}'.format(ccAmount) %}
 		${{ccAmountFmt}}
 		</td>
@@ -295,7 +313,7 @@
 		</td>
   </tr>
   <tr>
-    <td class="tg-totals" colspan="3">Credit Card Total Expected Deposit</td>
+    <td class="tg-totals" colspan="3">Direct Deposit Total Expected Deposit</td>
 	<td class="tg-totalAmounts">
 		${{ccNetAmountFmt}}</td>
   </tr>
@@ -305,6 +323,6 @@
 Report Calculated: {{created}}
 </p>
 <div style="page-break-after: always"></div>
-{% endfor %}}
+{% endfor %}
 </body>
 </html>

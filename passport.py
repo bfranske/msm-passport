@@ -1,12 +1,13 @@
 import uuid
 import requests
-from flask import Flask, render_template, session, request, redirect, url_for
+from flask import Flask, render_template, session, request, redirect, url_for, Response
 from flask_session import Session  # https://pythonhosted.org/Flask-Session
 import msal
 import yaml
 import logging
 import msmcharters
 import msmevents
+import msmsquareweb
 
 # Load configuration
 try:
@@ -102,6 +103,18 @@ def eventAjax():
         return redirect(url_for("index"))
     else:
         return render_template('eventVariations.html', variations=msmevents.getVariations(request.form))
+
+@app.route("/square/reports", methods = ['GET'])
+def squareReports():
+    token = _get_token_from_cache(passportConfig['permissionScope'])
+    if not token:
+        return redirect(url_for("login"))
+    if not 'Square.Reports.Get' in session['user']['roles']:
+        return redirect(url_for("index"))
+    elif 'pdf' in request.args:
+        return Response(msmsquareweb.getReport(request), mimetype="application/pdf")
+    else:
+        return Response(msmsquareweb.getReport(request), mimetype="text/html")
 
 def _load_cache():
     cache = msal.SerializableTokenCache()

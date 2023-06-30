@@ -5,8 +5,8 @@ from collections import Counter
 from pprint import pprint
 from datetime import datetime, timedelta, date, time, timezone
 from dateutil import tz
-from flask import Flask, render_template, session, request, redirect, url_for
 import weasyprint
+from flask import render_template
 
 import yaml
 
@@ -67,10 +67,7 @@ reportData = [{'location': 'CHSL',
                 'tax_collected': 1300,
                 'tenders': {'CASH': 7676, 'CREDIT_CARD': 265, 'NO_SALE': 0, 'OTHER': 322}}}]
 
-app = Flask(__name__)
-
-@app.route("/")
-def index():
+def getReport(request):
     try:
         beginYear=int(request.args['by'])
     except:
@@ -98,7 +95,9 @@ def index():
     beginDate=date(beginYear,beginMonth,beginDay)
     endDate=date(endYear,endMonth,endDay)
     reportData=msmsquare.getReportDataForDatesFromDBAllLocations(beginDate,endDate, db_session, headers)
-    return render_template('dailyreport.html', reportData=reportData, LOCAL_tzone = tz.gettz('America/Chicago'))
-
-if __name__ == "__main__":
-    app.run()
+    myHTML = render_template('dailyreport.html', reportData=reportData, LOCAL_tzone = tz.gettz('America/Chicago'))
+    weasyCSS='@page {size: letter; margin: .5in;}'
+    if 'pdf' in request.args:
+        return weasyprint.HTML(string=myHTML).write_pdf(stylesheets=[weasyprint.CSS(string=weasyCSS)])
+    else:
+        return myHTML

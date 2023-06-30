@@ -68,7 +68,7 @@ def loadOrders(locations, db_session, headers, beginTimeDT, endTimeDT):
 	return
 
 #True inception is Nov. 1, 2018
-beginTime=datetime(2023,4,1,0,0,0,tzinfo=LOCAL_tzone)
+beginTime=datetime(2023,5,1,0,0,0,tzinfo=LOCAL_tzone)
 endTime=datetime.now(timezone.utc)
 #endTime=datetime(2023,1,1,0,0,0,tzinfo=LOCAL_tzone)
 

@@ -109,7 +109,7 @@ def squareReports():
     token = _get_token_from_cache(passportConfig['permissionScope'])
     if not token:
         return redirect(url_for("login"))
-    if not 'Square.Reports.Get' in session['user']['roles']:
+    if not 'Square.DailyReports.Get' in session['user']['roles']:
         return redirect(url_for("index"))
     elif 'pdf' in request.args:
         return Response(msmsquareweb.getReport(request), mimetype="application/pdf")

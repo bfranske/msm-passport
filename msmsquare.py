@@ -4,7 +4,7 @@ import requests
 from collections import defaultdict
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, desc
 from sqlalchemy.dialects.postgresql.json import JSONB
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -831,4 +831,4 @@ def getReportDataForDatesFromDBAllLocations(beginDate,endDate, db_session, heade
     for report in reportsInDB:
         spelledDate = report.reportStartDate.strftime('%A %B %-d, %Y')
         reportData.append({'location':report.location_name, 'date': spelledDate, 'created': report.reportCreationDate, 'data': report.data})
-    return reportData
+    return 

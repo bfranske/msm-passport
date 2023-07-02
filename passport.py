@@ -115,6 +115,16 @@ def squareReports():
         return Response(msmsquareweb.getReport(request), mimetype="application/pdf")
     else:
         return Response(msmsquareweb.getReport(request), mimetype="text/html")
+    
+@app.route("/square/reports/select", methods = ['GET'])
+def squareReportsSelect():
+    token = _get_token_from_cache(passportConfig['permissionScope'])
+    if not token:
+        return redirect(url_for("login"))
+    if not 'Square.DailyReports.Get' in session['user']['roles']:
+        return redirect(url_for("index"))
+    else:
+        return render_template('squareReportsSelect.html', user=session["user"])
 
 def _load_cache():
     cache = msal.SerializableTokenCache()

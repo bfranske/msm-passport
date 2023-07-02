@@ -17,6 +17,9 @@
     {% if 'SpecialEvents.Purcases.Get' in roles %}
       <li><a href='/events/customers'>View Event Customers</a></li>
     {% endif %}
+    {% if 'Square.DailyReports.Get' in roles %}
+      <li><a href='/square/reports/select'>Get Daily Reports</a></li>
+    {% endif %}
   </ul>
 </body>
 </html>

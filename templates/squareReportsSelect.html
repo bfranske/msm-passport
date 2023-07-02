@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <script>
+        function getReports() {
+            var input = document.getElementById("start_date").value;
+            var startDate = new Date(input);
+            var input = document.getElementById("stop_date").value;
+            var stopDate = new Date(input);
+            buildURL = window.location.origin+"/square/reports?by="+startDate.getFullYear()+"&bm="+startDate.getMonth()+"&bd="+startDate.getDate()+"&ey="+startDate.getFullYear()+"&em="+startDate.getMonth()+"&ed="+startDate.getDate();
+            if (this.id == "pdf") {
+                buildURL = buildURL + "&pdf";
+            }
+            window.location.href = buildURL;
+        }
+    </script>
+<head>
+    <meta charset="UTF-8">
+    <title>MSM Square Reporting</title>
+</head>
+<body>
+    <h1>Minnesota Streetcar Museum Square Reporting</h1>
+    <h2>Welcome {{ user.get("name") }}!</h2>
+    <a href="/">Home</a> - <a href="/logout">Logout</a>
+    <hr>
+    <p>
+        Enter a starting and ending date range to get reports, select either Get Web Reports or Get PDF Reports to obtain the reports.
+    </p>
+    <p>
+        Note that it can take a little time for the numbers to settle in Square and so it is strongly suggested that the end date be at least 3 days ago.
+    </p>
+    <p>
+        <form id="form1">
+            <label for="start_date">Reporting Period Start Date:</label><br>
+		    <input type="date" id="start_date" name="start_date"><br>
+            <label for="stop_date">Reporting Period Stop Date:</label><br>
+		    <input type="date" id="stop_date" name="stop_date"><br>
+            <button id="web" onclick="getReports()">Get Web Reports</button> <button id="pdf" onclick="getReports()">Get PDF Reports</button>
+        </form>
+    </p>
+</body>
+</html>
+

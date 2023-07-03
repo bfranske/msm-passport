@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <script>
-        function getReports() {
+        function getReports(form) {
             var input = document.getElementById("start_date").value;
             var startDate = new Date(input);
             var input = document.getElementById("stop_date").value;
@@ -34,7 +34,7 @@
 		    <input type="date" id="start_date" name="start_date"><br>
             <label for="stop_date">Reporting Period Stop Date:</label><br>
 		    <input type="date" id="stop_date" name="stop_date"><br>
-            <button id="web" onclick="getReports()">Get Web Reports</button> <button id="pdf" onclick="getReports()">Get PDF Reports</button>
+            <button id="web" onclick="getReports(this.form)">Get Web Reports</button> <button id="pdf" onclick="getReports(this.form)">Get PDF Reports</button>
         </form>
     </p>
 </body>

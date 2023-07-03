@@ -33,9 +33,6 @@ LOCAL_tzone = tz.gettz(msmSquareConfig['localTimezone'])
 
 headers = {"Authorization":"Bearer "+ accessToken, 'Square-Version':msmSquareConfig['squareAPIVersion']}
 
-#Ensure all the required tables exist in the database
-msmsquare.base.metadata.create_all(msmsquare.db)
-
 reportData = [{'location': 'CHSL',
         'date': 'May 4, 2019',
         'data': {'charters': 0,
@@ -71,7 +68,6 @@ def getReport(request):
     #connect to the squareData cache database, setup SQLAlchemy stuff
     db_string = msmSquareConfig['postgresConnection']
     db = create_engine(db_string, connect_args={'sslmode':'require'})  
-    base = declarative_base()
     Session = sessionmaker(db)  # Create a session class associated with the database engine
 
     db_session = Session() # create a working database session for version 2

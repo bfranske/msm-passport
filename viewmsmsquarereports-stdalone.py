@@ -71,10 +71,10 @@ def index():
     #connect to the squareData cache database, setup SQLAlchemy stuff
     db_string = msmSquareConfig['postgresConnection']
     db = create_engine(db_string, connect_args={'sslmode':'require'})  
-    base = declarative_base()
     Session = sessionmaker(db)  # Create a session class associated with the database engine
 
     db_session = Session() # create a working database session for version 2
+
     try:
         beginYear=int(request.args['by'])
     except:

@@ -33,14 +33,10 @@ headers = {"Authorization":"Bearer "+ accessToken, 'Square-Version':msmSquareCon
 
 #connect to the squareData cache database, setup SQLAlchemy stuff
 db_string = msmSquareConfig['postgresConnection']
-db = create_engine(db_string, connect_args={'sslmode':'require'})  
-base = declarative_base()
+db = create_engine(db_string, connect_args={'sslmode':'require'})
 Session = sessionmaker(db)  # Create a session class associated with the database engine
 
 db_session = Session() # create a working database session for version 2
-
-#Ensure all the required tables exist in the database
-msmsquare.base.metadata.create_all(msmsquare.db)
 
 beginDate=date(2023,5,1)
 endDate=date(2023,5,31)

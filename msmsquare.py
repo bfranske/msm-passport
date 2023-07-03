@@ -2,11 +2,10 @@
 # It has been updated/rewritten to work with the Square v2 API
 import requests
 from collections import defaultdict
+from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, desc
 from sqlalchemy.dialects.postgresql.json import JSONB
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from datetime import datetime, timedelta, date, time, timezone
 from dateutil import tz
@@ -24,11 +23,7 @@ try:
 except IOError:
     print("Could not read config-msmsquare.yaml file")
 
-#connect to the squareData cache database, setup SQLAlchemy stuff
-db_string = msmSquareConfig['postgresConnection']
-db = create_engine(db_string, connect_args={'sslmode':'require'})  
 base = declarative_base()
-Session = sessionmaker(db)  # Create a session class associated with the database engine
 
 class Location(base):  
     # Create an ORM class for holding the Location data in JSONB format

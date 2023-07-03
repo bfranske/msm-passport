@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
     <script>
-        function getReports(form) {
+        function getReports(form,pdf) {
             var input = document.getElementById("start_date").value;
             var startDate = new Date(input);
             var input = document.getElementById("stop_date").value;
             var stopDate = new Date(input);
             buildURL = window.location.origin+"/square/reports?by="+startDate.getFullYear()+"&bm="+(startDate.getUTCMonth()+1)+"&bd="+startDate.getUTCDate()+"&ey="+stopDate.getFullYear()+"&em="+(stopDate.getUTCMonth()+1)+"&ed="+stopDate.getUTCDate();
-            if (this.id == "pdf") {
+            if (pdf) {
                 buildURL = buildURL + "&pdf";
             }
             window.location.href = buildURL;
@@ -34,7 +34,7 @@
 		    <input type="date" id="start_date" name="start_date"><br>
             <label for="stop_date">Reporting Period Stop Date:</label><br>
 		    <input type="date" id="stop_date" name="stop_date"><br>
-            <button id="web" onclick="getReports(this.form)">Get Web Reports</button> <button id="pdf" onclick="getReports(this.form)">Get PDF Reports</button>
+            <button id="web" onclick="getReports(this.form,pdf=0)">Get Web Reports</button> <button id="pdf" onclick="getReports(this.form,pdf=1)">Get PDF Reports</button>
         </form>
     </p>
 </body>

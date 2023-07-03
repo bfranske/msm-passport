@@ -6,11 +6,12 @@
             var startDate = new Date(input);
             var input = document.getElementById("stop_date").value;
             var stopDate = new Date(input);
-            buildURL = window.location.origin+"/square/reports?by="+startDate.getFullYear()+"&bm="+startDate.getMonth()+"&bd="+startDate.getDate()+"&ey="+stopDate.getFullYear()+"&em="+stopDate.getMonth()+"&ed="+stopDate.getDate();
+            buildURL = window.location.origin+"/square/reports?by="+startDate.getFullYear()+"&bm="+(startDate.getUTCMonth()+1)+"&bd="+startDate.getUTCDate()+"&ey="+stopDate.getFullYear()+"&em="+(stopDate.getUTCMonth()+1)+"&ed="+stopDate.getUTCDate();
             if (this.id == "pdf") {
                 buildURL = buildURL + "&pdf";
             }
-            window.location.href = buildURL;
+            alert(buildURL);
+            //window.location.href = buildURL;
         }
     </script>
 <head>

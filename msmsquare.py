@@ -831,4 +831,4 @@ def getReportDataForDatesFromDBAllLocations(beginDate,endDate, db_session, heade
     for report in reportsInDB:
         spelledDate = report.reportStartDate.strftime('%A %B %-d, %Y')
         reportData.append({'location':report.location_name, 'date': spelledDate, 'created': report.reportCreationDate, 'data': report.data})
-    return 
+    return reportData

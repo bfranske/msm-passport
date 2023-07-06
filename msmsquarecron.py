@@ -11,6 +11,8 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import create_engine
 
 def main():
+    logging.basicConfig(level=logging.INFO)
+    
     # Load configuration
     try:
         with open("config-msmsquare.yaml", 'r') as stream:
@@ -36,10 +38,6 @@ def main():
     Session = sessionmaker(db)  # Create a session class associated with the database engine
 
     db_session = Session() # create a working database session for version 2
-
-    logging.basicConfig(level=logging.INFO)
-
-    db_session = msmsquare.Session() # create a working database session for version 2
 
     logging.info('Starting Cron DB Load')
 

@@ -9,3 +9,4 @@ sqlalchemy>=2.0.5.post1
 python-dateutil>=2.8.1
 weasyprint>=58.1
 bottle
+psycopg2-binary

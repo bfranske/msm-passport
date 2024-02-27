@@ -6,7 +6,7 @@
             var startDate = new Date(input);
             var input = document.getElementById("stop_date").value;
             var stopDate = new Date(input);
-            buildURL = window.location.origin+"/square/reports?by="+startDate.getFullYear()+"&bm="+(startDate.getUTCMonth()+1)+"&bd="+startDate.getUTCDate()+"&ey="+stopDate.getFullYear()+"&em="+(stopDate.getUTCMonth()+1)+"&ed="+stopDate.getUTCDate();
+            buildURL = window.location.origin+"/square/reports?by="+startDate.getUTCFullYear()+"&bm="+(startDate.getUTCMonth()+1)+"&bd="+startDate.getUTCDate()+"&ey="+stopDate.getUTCFullYear()+"&em="+(stopDate.getUTCMonth()+1)+"&ed="+stopDate.getUTCDate();
             if (pdf) {
                 buildURL = buildURL + "&pdf";
             }

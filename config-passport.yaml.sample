@@ -1,7 +1,7 @@
 # Application (client) ID of app registration
 clientID: "MICROSOFTCLIENTIDHERE"
 
-# Application Client Secret
+# Application Client Secret - Create this in the Azure Portal App Registation, Certificates and Secrets page
 clientSecret: "MICROSOFTCLIENTSECRETHERE"
 
 # App Authority URI

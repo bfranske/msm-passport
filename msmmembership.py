@@ -97,4 +97,6 @@ def getTCLAllAddressesCSV():
         #Output to CSV
         writer.writerow([addressee, streetAddress, suppAddress1, city, state, postalCode, postalCodeSuffix, country, suppAddress2])
     
-    return csvOutput
+    csvData = csvOutput.getvalue()
+
+    return csvData

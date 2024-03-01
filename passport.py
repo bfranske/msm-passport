@@ -137,7 +137,7 @@ def getTCLMailingList():
     else:
         #Generate the list and return it as a CSV
         csvData = msmmembership.getTCLAllAddressesCSV()
-        tclFile = Response(csvData, mimetype='text/csv', headers={'Content-disposition': 'attachment; filename=TCLAddresses.csv'}))
+        tclFile = Response(csvData, mimetype='text/csv', headers={'Content-disposition': 'attachment; filename=TCLAddresses.csv'})
         #return render_template('squareReportsSelect.html', user=session["user"])
         return tclFile
 

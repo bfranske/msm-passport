@@ -6,3 +6,4 @@ flask_session/*
 .vscode/*
 __pycache__/*
 ms-identity-python-webapp-master.zip
+config-msmmembership.yaml

@@ -8,6 +8,7 @@ import logging
 import msmcharters
 import msmevents
 import msmsquareweb
+import msmmembership
 
 # Load configuration
 try:
@@ -125,6 +126,20 @@ def squareReportsSelect():
         return redirect(url_for("index"))
     else:
         return render_template('squareReportsSelect.html', user=session["user"])
+    
+@app.route("/memberdb/tclmailing", methods = ['GET'])
+def getTCLMailingList():
+    token = _get_token_from_cache(passportConfig['permissionScope'])
+    if not token:
+        return redirect(url_for("login"))
+    if not 'MembershipDB.TCLAddresses.Get' in session['user']['roles']:
+        return redirect(url_for("index"))
+    else:
+        #Generate the list and return it as a CSV
+        csvData = msmmembership.getTCLAllAddressesCSV()
+        tclFile = Response(csvData, mimetype='text/csv', headers={'Content-disposition': 'attachment; filename=TCLAddresses.csv'}))
+        #return render_template('squareReportsSelect.html', user=session["user"])
+        return tclFile
 
 def _load_cache():
     cache = msal.SerializableTokenCache()

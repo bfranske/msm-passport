@@ -23,8 +23,8 @@ def getTCLComplimentaryAddresses():
     # Can either set limit to 0 and get all records OR set a limit and then keep querying, increasing the offset each time by the limit amount until the countFetched value returned is less than the limit
 
     payload = {
-            'select': ['contact_id.addressee_display', 'address.*'],
-            'join': [['Address AS address', 'LEFT', ['contact_id.address_primary', '=', 'address.id']]],
+            'select': ['contact_id.addressee_display', 'address.*', 'country.name', 'state_province.name', 'state_province.abbreviation'],
+            'join': [['Address AS address', 'LEFT', ['contact_id.address_primary', '=', 'address.id']], ['Country AS country', 'LEFT', ['address.country_id', '=', 'country.id']], ['StateProvince AS state_province', 'LEFT', ['address.state_province_id', '=', 'state_province.id']]],
             'where': [['group_id', '=', 10], ['status', '=', 'Added'], ['contact_id.is_deleted', '=', False], ['contact_id.is_deceased', '=', False], ['contact_id.do_not_mail', '=', False]],
             'limit': 0,
             'offset': 0
@@ -51,8 +51,8 @@ def getTCLMemberAddresses():
     # Can either set limit to 0 and get all records OR set a limit and then keep querying, increasing the offset each time by the limit amount until the countFetched value returned is less than the limit
 
     payload = {
-        'select': ['*', 'contact.contact_type', 'contact.addressee_display', 'address.*'],
-        'join': [['Contact AS contact', 'LEFT', ['contact.id', '=', 'contact_id']], ['Address AS address', 'LEFT', ['contact.address_primary', '=', 'address.id']]],
+        'select': ['*', 'contact.contact_type', 'contact.addressee_display', 'address.*', 'country.name', 'state_province.name', 'state_province.abbreviation'],
+        'join': [['Contact AS contact', 'LEFT', ['contact.id', '=', 'contact_id']], ['Address AS address', 'LEFT', ['contact.address_primary', '=', 'address.id']], ['Country AS country', 'LEFT', ['address.country_id', '=', 'country.id']], ['StateProvince AS state_province', 'LEFT', ['address.state_province_id', '=', 'state_province.id']]],
         'where': [['OR', [['AND', [['contact.contact_type', '=', 'Individual'], ['OR', [['membership_type_id', '=', 1], ['membership_type_id', '=', 12], ['membership_type_id', '=', 5], ['membership_type_id', '=', 11]]]]], ['AND', [['contact.contact_type', '=', 'Household'], ['OR', [['membership_type_id', '=', 9], ['membership_type_id', '=', 10]]]]]]], ['status_id', '<=', 3], ['contact.is_deceased', '=', False], ['contact.is_deleted', '=', False], ['contact.do_not_mail', '=', False]],
         'limit': 0,
         }
@@ -87,12 +87,10 @@ def getTCLAllAddressesCSV():
         streetAddress = compAddress['address.street_address']
         suppAddress1 = compAddress['address.supplemental_address_1']
         city = compAddress['address.city']
-        #Need to do a join on state
-        state = compAddress['address.state_province_id']
+        state = compAddress['state_province.abbreviation']
         postalCode = compAddress['address.postal_code']
         postalCodeSuffix = compAddress['address.postal_code_suffix']
-        #Need to do a join on country
-        country = compAddress['address.country_id']
+        country = compAddress['country.name']
         suppAddress2 = compAddress['address.supplemental_address_2']
         #Output to CSV
         writer.writerow([addressee, streetAddress, suppAddress1, city, state, postalCode, postalCodeSuffix, country, suppAddress2])

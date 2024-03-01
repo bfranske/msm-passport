@@ -83,7 +83,7 @@ def getTCLAllAddressesCSV():
     writer.writerow(header)
 
     for memberAddress in memberCopies:
-        addressee = memberAddress['contact_id.addressee_display']
+        addressee = memberAddress['contact.addressee_display']
         streetAddress = memberAddress['address.street_address']
         suppAddress1 = memberAddress['address.supplemental_address_1']
         city = memberAddress['address.city']

@@ -72,7 +72,7 @@ def getTCLMemberAddresses():
 def getTCLAllAddressesCSV():
 
     compCopies = getTCLComplimentaryAddresses()
-    #memberCopies = getTCLMemberAddresses()
+    memberCopies = getTCLMemberAddresses()
 
     header = ['Addressee', 'Street Address', 'Supplemental Address 1', 'City', 'State', 'Postal Code', 'Postal Code Suffix', 'Country', 'Supplemental Address 2']
 
@@ -81,6 +81,19 @@ def getTCLAllAddressesCSV():
 
     writer = csv.writer(csvOutput)
     writer.writerow(header)
+
+    for memberAddress in memberCopies:
+        addressee = memberAddress['contact_id.addressee_display']
+        streetAddress = memberAddress['address.street_address']
+        suppAddress1 = memberAddress['address.supplemental_address_1']
+        city = memberAddress['address.city']
+        state = memberAddress['state_province.abbreviation']
+        postalCode = memberAddress['address.postal_code']
+        postalCodeSuffix = memberAddress['address.postal_code_suffix']
+        country = memberAddress['country.name']
+        suppAddress2 = memberAddress['address.supplemental_address_2']
+        #Output to CSV
+        writer.writerow([addressee, streetAddress, suppAddress1, city, state, postalCode, postalCodeSuffix, country, suppAddress2])
 
     for compAddress in compCopies:
         addressee = compAddress['contact_id.addressee_display']

@@ -655,8 +655,11 @@ def summaryFinancialsForPurchase(paymentsAndOrders, locationID, db_session, head
     else:
         for item in lineItems:
             if locationID == 'LBR2E5T341WDH':
-                # Webstore sale, put all in online category
-                finStats['online_sales'] += item['total_money']['amount']
+                # Webstore sale, put all in online category, except for streetcar camp registrations
+                if item['name'] == 'Streetcar Camp':
+                    special_events.append({item['name']:item['total_money']['amount']})
+                else:
+                    finStats['online_sales'] += item['total_money']['amount']
             # Custom Amount items have no catalog object id, they should be treated as uncategorized
             elif not 'catalog_object_id' in item:
                 if item['item_type'] == 'CUSTOM_AMOUNT':
@@ -719,8 +722,11 @@ def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
     lineItems = getReturnedLineItemsFromOrder(refundIDs['orderID'], db_session, headers)
     for item in lineItems:
         if locationID == 'LBR2E5T341WDH':
-                # Webstore sale, put all in online category
-                finStats['online_sales'] += 0-item['total_money']['amount']
+                # Webstore sale, put all in online category, except for streetcar camp registrations
+                if item['name'] == 'Streetcar Camp':
+                    special_events.append({item['name']:0-item['total_money']['amount']})
+                else:
+                    finStats['online_sales'] += 0-item['total_money']['amount']
         elif not 'catalog_object_id' in item:
                 if item['item_type'] == 'CUSTOM_AMOUNT':
                     finStats['uncategorized'] += 0-item['total_money']['amount']

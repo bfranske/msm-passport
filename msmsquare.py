@@ -12,6 +12,7 @@ from dateutil import tz
 from pprint import pprint
 import logging
 import yaml
+import threading
 
 # Load configuration
 try:
@@ -806,10 +807,11 @@ def generateSummaryStatsForDateRange(beginTime,endTime,locationID,db_session, he
         raise Exception('Multiple Daily Reports Found in Database with same location and start/end date')
     return totalSummaries
 
-def generateReportDataForDates(beginDate,endDate, locationID,db_session, headers):
+def generateReportDataForDates(beginDate,endDate,locationID,db_session,headers):
     UTC_tzone = tz.gettz('UTC')
     LOCAL_tzone = tz.gettz(msmSquareConfig['localTimezone'])
     deltaDays = endDate-beginDate
+    threads = list()
     for i in range(deltaDays.days + 1):
         date = beginDate + timedelta(days=i)
         newDayTime = time(3,0,0,tzinfo=LOCAL_tzone)
@@ -821,7 +823,11 @@ def generateReportDataForDates(beginDate,endDate, locationID,db_session, headers
         endTime=endTime.astimezone(UTC_tzone).strftime('%Y-%m-%dT%H:%M:%SZ')
         beginTime=beginTime.astimezone(UTC_tzone).strftime('%Y-%m-%dT%H:%M:%SZ')
         logging.info('Generating Report for: %s for Location %s', spelledDate, locationID)
-        generateSummaryStatsForDateRange(beginTime,endTime,locationID,db_session, headers)
+        x = threading.Thread(target=generateSummaryStatsForDateRange,args=(beginTime,endTime,locationID,db_session,headers))
+        threads.append(x)
+        x.start()
+    for t in threads:
+        t.join()
     return
 
 def getReportDataForDatesFromDBAllLocations(beginDate,endDate, db_session, headers):

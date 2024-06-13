@@ -37,8 +37,8 @@ db_string = msmSquareConfig['postgresConnection']
 db = create_engine(db_string, connect_args={'sslmode':'require'})
 Session = scoped_session(sessionmaker(db))  # Create a session class associated with the database engine
 
-unscopedSession = sessionmaker(db)
-db_session = unscopedSession() # create a working database session for version 2
+#unscopedSession = sessionmaker(db)
+#db_session = unscopedSession() # create a working database session for version 2
 
 beginDate=date(2024,5,1)
 endDate=date(2024,6,12)
@@ -49,7 +49,7 @@ endDate=date(2024,6,12)
 
 
 threads = list()
-for location in msmsquare.getLocations(db_session, headers):
+for location in msmsquare.getLocations(Session, headers):
     #do for each location
     x = threading.Thread(target=msmsquare.generateReportDataForDates,args=(beginDate,endDate, location['id'],Session, headers))
     threads.append(x)

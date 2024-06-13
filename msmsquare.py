@@ -669,17 +669,17 @@ def summaryFinancialsForPurchase(paymentsAndOrders, locationID, db_session, head
                 category = getCategoryForObject(item['catalog_object_id'], item['catalog_version'], db_session, headers)
                 if not 'categoryName' in category:
                     finStats['uncategorized'] += item['total_money']['amount']
-                elif category['categoryName'] == 'Special Events':
+                elif category['categoryName'].lower() == 'special events':
                     special_events.append({item['name']:item['total_money']['amount']})
-                elif category['categoryName'] == 'Fares':
+                elif category['categoryName'].lower() == 'fares':
                     finStats['fares'] += item['total_money']['amount']
-                elif category['categoryName'] == 'Passes':
+                elif category['categoryName'].lower == 'passes':
                     finStats['passes'] += item['total_money']['amount']
-                elif category['categoryName'] == 'Donations':
+                elif category['categoryName'].lower() == 'donations':
                     finStats['donations'] += item['total_money']['amount']
-                elif category['categoryName'] == 'Charters':
+                elif category['categoryName'].lower() == 'charters':
                     finStats['charters'] += item['total_money']['amount']
-                elif category['categoryName'] == 'Membership':
+                elif category['categoryName'].lower() == 'membership':
                     finStats['memberships'] += item['total_money']['amount']
                 else:
                     if item['total_tax_money']['amount'] == 0:
@@ -735,20 +735,20 @@ def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
             category = getCategoryForObject(item['catalog_object_id'], item['catalog_version'], db_session, headers)
             if not 'categoryName' in category:
                 finStats['uncategorized'] += 0-item['total_money']['amount']
-            elif category['categoryName'] == 'Special Events':
+            elif category['categoryName'].lower() == 'special events':
                 if item['variation_name']:
                     special_events.append({item['variation_name']:0-item['total_money']['amount']})
                 else:
                     special_events.append({item['name']:0-item['total_money']['amount']})
-            elif category['categoryName'] == 'Fares':
+            elif category['categoryName'].lower() == 'fares':
                 finStats['fares'] += 0-item['total_money']['amount']
-            elif category['categoryName'] == 'Passes':
+            elif category['categoryName'].lower() == 'passes':
                 finStats['passes'] += 0-item['total_money']['amount']
-            elif category['categoryName'] == 'Donations':
+            elif category['categoryName'].lower() == 'donations':
                 finStats['donations'] += 0-item['total_money']['amount']
-            elif category['categoryName'] == 'Charters':
+            elif category['categoryName'].lower() == 'charters':
                 finStats['charters'] += 0-item['total_money']['amount']
-            elif category['categoryName'] == 'Membership':
+            elif category['categoryName'].lower() == 'membership':
                 finStats['memberships'] += 0-item['total_money']['amount']
             else:
                 if item['total_tax_money']['amount'] == 0:

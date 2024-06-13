@@ -37,7 +37,8 @@ db_string = msmSquareConfig['postgresConnection']
 db = create_engine(db_string, connect_args={'sslmode':'require'})
 Session = scoped_session(db)  # Create a session class associated with the database engine
 
-db_session = Session() # create a working database session for version 2
+unscopedSession = sessionmaker(db)
+db_session = unscopedSession() # create a working database session for version 2
 
 beginDate=date(2024,5,1)
 endDate=date(2024,6,12)

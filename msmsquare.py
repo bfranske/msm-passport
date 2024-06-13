@@ -606,29 +606,6 @@ def getPayoutEntriesByDateRangeFromSquare(startTime, stopTime, locationID, db_se
             pass
     return payoutEntryList
 
-def combineIntoDefaultDict(d, new_d):
-	# When passed a default dict and a second dict, sum the values of the second dict into the default dict
-	for k, v in new_d.items():
-		if isinstance(v, dict):
-			combineIntoDefaultDict(d[k], v)
-		else: 
-			d[k] = d.setdefault(k, 0) + v
-
-def default_dict_to_regular(d):
-	# Take a defaultdict and convert it to a regular dict including nested default dicts
-	if isinstance(d, defaultdict):
-		d = {k: default_dict_to_regular(v) for k, v in d.items()}
-	return d
-'''
-def sumDicts(listToProcess):
-	# Takes a list of dicts and sums the values by each key, returning a single dict, works with nested dicts too
-	nested = lambda: defaultdict(nested)
-	d = nested()
-	for subd in listToProcess:
-		combineIntoDefaultDict(d, subd)
-	return default_dict_to_regular(d)
-'''
-
 def sumDicts(dicts_list):
    #Sums the values of matching keys from a list of dictionaries. If a value is another dictionary, recursively sums its values.
     result = {}

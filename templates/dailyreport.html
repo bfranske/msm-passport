@@ -30,7 +30,7 @@
 		<h3>Income Classes</h3>
 		<table class="tg">
 		  {% set totalIncome=0.00 %}
-		  {% if day['data']['uncategorized'] > 0 %}
+		  {% if not day['data']['uncategorized'] == 0 %}
 		  <tr>
 			<td class="tg-0lax"></td>
 			<td class="tg-0lax">Uncategorized</td>
@@ -43,7 +43,7 @@
 				</td>
 		  </tr>
 		  {% endif %}
-		  {% if day['data']['online_sales'] > 0 %}
+		  {% if not day['data']['online_sales'] == 0 %}
 		  <tr>
 			<td class="tg-0lax"></td>
 			<td class="tg-0lax">Online Sales</td>

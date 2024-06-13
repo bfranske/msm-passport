@@ -773,6 +773,7 @@ def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
     return finStats
 
 def generateSummaryStatsForDateRange(beginTime,endTime,locationID,db_session, headers):
+    sema.acquire()
     location=getLocationByID(locationID,db_session,headers)
     # Get list of orderIDs in the date range
     paymentsAndOrders = getPaymentsAndOrdersByDateRange(beginTime, endTime, locationID, db_session, headers)
@@ -806,6 +807,7 @@ def generateSummaryStatsForDateRange(beginTime,endTime,locationID,db_session, he
     except MultipleResultsFound:
         raise Exception('Multiple Daily Reports Found in Database with same location and start/end date')
     db_session.remove()
+    sema.release()
     return totalSummaries
 
 def generateReportDataForDates(beginDate,endDate,locationID,db_session,headers):
@@ -813,6 +815,8 @@ def generateReportDataForDates(beginDate,endDate,locationID,db_session,headers):
     LOCAL_tzone = tz.gettz(msmSquareConfig['localTimezone'])
     deltaDays = endDate-beginDate
     threads = list()
+    maxthreads = 5
+    global sema = threading.Semaphore(value=maxthreads)
     for i in range(deltaDays.days + 1):
         date = beginDate + timedelta(days=i)
         newDayTime = time(3,0,0,tzinfo=LOCAL_tzone)

@@ -806,8 +806,7 @@ def generateSummaryStatsForDateRange(beginTime,endTime,locationID,db_session, he
         raise Exception('Multiple Daily Reports Found in Database with same location and start/end date')
     return totalSummaries
 
-def generateReportDataForDates(beginDate,endDate, locationID,Session, headers):
-    db_session = Session()
+def generateReportDataForDates(beginDate,endDate, locationID,db_session, headers):
     UTC_tzone = tz.gettz('UTC')
     LOCAL_tzone = tz.gettz(msmSquareConfig['localTimezone'])
     deltaDays = endDate-beginDate

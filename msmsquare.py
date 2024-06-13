@@ -724,6 +724,9 @@ def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
     tenders = []
     lineItems = getReturnedLineItemsFromOrder(refundIDs['orderID'], db_session, headers)
     for item in lineItems:
+        if item['uid'] == 'itemization:99fbf73a-0f7c-4b98-9ec6-ea68bae987aa':
+            print('Processing item with issue')
+            pprint(item)
         if locationID == 'LBR2E5T341WDH':
                 # Webstore sale, put all in online category, except for streetcar camp registrations
                 if item['name']:
@@ -734,6 +737,7 @@ def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
                 else:
                     finStats['online_sales'] += 0-item['total_money']['amount']
         elif not 'catalog_object_id' in item:
+            print('Found uncategorized return')
             finStats['uncategorized'] += 0-item['total_money']['amount']
         else:
             # get category name for each item
@@ -761,6 +765,8 @@ def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
                 else:
                     finStats['merchandise_taxable'] += 0-item['total_money']['amount']
         finStats['tax_collected'] += 0-item['total_tax_money']['amount']
+        if item['uid'] == 'itemization:99fbf73a-0f7c-4b98-9ec6-ea68bae987aa':
+            print('Done processing item with issue')
     finStats['special_events'] = sumDicts(special_events)
     refund = getRefund(refundIDs['refundID'], db_session, headers) 
     if 'processing_fee' in refund:

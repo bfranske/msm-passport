@@ -34,7 +34,7 @@ headers = {"Authorization":"Bearer "+ accessToken, 'Square-Version':msmSquareCon
 
 #connect to the squareData cache database, setup SQLAlchemy stuff
 db_string = msmSquareConfig['postgresConnection']
-db = create_engine(db_string, connect_args={'sslmode':'require'})
+db = create_engine(db_string, connect_args={'sslmode':'require'}, max_overflow=100)
 Session = scoped_session(sessionmaker(db))  # Create a session class associated with the database engine
 
 #unscopedSession = sessionmaker(db)

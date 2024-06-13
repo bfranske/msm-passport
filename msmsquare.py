@@ -773,6 +773,7 @@ def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
     return finStats
 
 def generateSummaryStatsForDateRange(beginTime,endTime,locationID,db_session, headers):
+    global sema
     sema.acquire()
     location=getLocationByID(locationID,db_session,headers)
     # Get list of orderIDs in the date range
@@ -816,7 +817,8 @@ def generateReportDataForDates(beginDate,endDate,locationID,db_session,headers):
     deltaDays = endDate-beginDate
     threads = list()
     maxthreads = 5
-    global sema = threading.Semaphore(value=maxthreads)
+    global sema
+    sema = threading.Semaphore(value=maxthreads)
     for i in range(deltaDays.days + 1):
         date = beginDate + timedelta(days=i)
         newDayTime = time(3,0,0,tzinfo=LOCAL_tzone)

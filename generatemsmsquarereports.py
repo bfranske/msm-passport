@@ -48,7 +48,7 @@ endDate=date(2024,6,12)
 
 
 threads = list()
-for location in msmsquare.getLocations(Session, headers):
+for location in msmsquare.getLocations(db_session, headers):
     #do for each location
     x = threading.Thread(target=msmsquare.generateReportDataForDates,args=(beginDate,endDate, location['id'],Session, headers))
     threads.append(x)

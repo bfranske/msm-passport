@@ -5,7 +5,7 @@ from collections import Counter
 from pprint import pprint
 from datetime import datetime, timedelta, date, time, timezone
 from dateutil import tz
-from sqlalchemy.orm import declarative_base, sessionmaker, scoped_session
+from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import create_engine
 import threading
 
@@ -35,7 +35,7 @@ headers = {"Authorization":"Bearer "+ accessToken, 'Square-Version':msmSquareCon
 #connect to the squareData cache database, setup SQLAlchemy stuff
 db_string = msmSquareConfig['postgresConnection']
 db = create_engine(db_string, connect_args={'sslmode':'require'})
-Session = scoped_session(db)  # Create a session class associated with the database engine
+Session = sessionmaker(db)  # Create a session class associated with the database engine
 
 db_session = Session() # create a working database session for version 2
 
@@ -57,8 +57,6 @@ for location in msmsquare.getLocations(db_session, headers):
 
 for t in threads:
     t.join()
-
-Session.remove()
 
 #test = msmsquare.generateReportDataForDates(beginDate,endDate, locationID,db_session, headers)
 # test = msmsquare.getPayment('E2EIz42nt0BCvi75DxmyPsMF', db_session, headers)

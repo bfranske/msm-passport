@@ -762,7 +762,6 @@ def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
                 else:
                     finStats['merchandise_taxable'] += 0-item['total_money']['amount']
         finStats['tax_collected'] += 0-item['total_tax_money']['amount']
-        if item['uid'] == 'itemization:99fbf73a-0f7c-4b98-9ec6-ea68bae987aa':
     finStats['special_events'] = sumDicts(special_events)
     refund = getRefund(refundIDs['refundID'], db_session, headers) 
     if 'processing_fee' in refund:

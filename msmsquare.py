@@ -619,7 +619,7 @@ def default_dict_to_regular(d):
 	if isinstance(d, defaultdict):
 		d = {k: default_dict_to_regular(v) for k, v in d.items()}
 	return d
-
+'''
 def sumDicts(listToProcess):
 	# Takes a list of dicts and sums the values by each key, returning a single dict, works with nested dicts too
 	nested = lambda: defaultdict(nested)
@@ -627,6 +627,22 @@ def sumDicts(listToProcess):
 	for subd in listToProcess:
 		combineIntoDefaultDict(d, subd)
 	return default_dict_to_regular(d)
+'''
+
+def sumDicts(dicts_list):
+   #Sums the values of matching keys from a list of dictionaries. If a value is another dictionary, recursively sums its values.
+    result = {}
+    for d in dicts_list:
+        for key, value in d.items():
+            if isinstance(value, dict):
+                # Recursively sum nested dictionary values
+                nested_sum = sumDicts([value])
+                result[key] = result.get(key, {}).copy()
+                for nested_key, nested_value in nested_sum.items():
+                    result[key][nested_key] = result[key].get(nested_key, 0) + nested_value
+            else:
+                result[key] = result.get(key, 0) + value
+    return result
 
 def summaryFinancialsForPurchase(paymentsAndOrders, locationID, db_session, headers):
     # Return financial statistics for a given order
@@ -771,7 +787,7 @@ def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
     finStats['tenders'] = sumDicts(tenders)
     return finStats
 
-def generateSummaryStatsForDateRange(beginTime,endTime,locationID,db_session, headers):
+def generateSummaryStatsForDateRange(beginTime,endTime,locationID,db_session,headers):
     location=getLocationByID(locationID,db_session,headers)
     # Get list of orderIDs in the date range
     paymentsAndOrders = getPaymentsAndOrdersByDateRange(beginTime, endTime, locationID, db_session, headers)

@@ -664,7 +664,7 @@ def summaryFinancialsForPurchase(paymentsAndOrders, locationID, db_session, head
                 else:
                     finStats['online_sales'] += item['total_money']['amount']
             # Custom Amount items have no catalog object id, they should be treated as uncategorized
-            elif not item['catalog_object_id']:
+            elif not 'catalog_object_id' in item:
                 if item['item_type'] == 'CUSTOM_AMOUNT':
                     finStats['uncategorized'] += item['total_money']['amount']
             else:
@@ -733,8 +733,8 @@ def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
                         finStats['online_sales'] += 0-item['total_money']['amount']
                 else:
                     finStats['online_sales'] += 0-item['total_money']['amount']
-        elif not item['catalog_object_id']:
-                finStats['uncategorized'] += 0-item['total_money']['amount']
+        elif not 'catalog_object_id' in item:
+            finStats['uncategorized'] += 0-item['total_money']['amount']
         else:
             # get category name for each item
             category = getCategoryForObject(item['catalog_object_id'], item['catalog_version'], db_session, headers)

@@ -739,6 +739,7 @@ def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
         elif not 'catalog_object_id' in item:
             print('Found uncategorized return')
             finStats['uncategorized'] += 0-item['total_money']['amount']
+            print(finStats['uncategorized'])
         else:
             # get category name for each item
             category = getCategoryForObject(item['catalog_object_id'], item['catalog_version'], db_session, headers)

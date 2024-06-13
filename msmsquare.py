@@ -772,10 +772,9 @@ def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
     finStats['tenders'] = sumDicts(tenders)
     return finStats
 
-def generateSummaryStatsForDateRange(beginTime,endTime,locationID,spelledDate,db_session, headers):
+def generateSummaryStatsForDateRange(beginTime,endTime,locationID,db_session, headers):
     global sema
     sema.acquire()
-    logging.info('Generating Report for: %s for Location %s', spelledDate, locationID)
     location=getLocationByID(locationID,db_session,headers)
     # Get list of orderIDs in the date range
     paymentsAndOrders = getPaymentsAndOrdersByDateRange(beginTime, endTime, locationID, db_session, headers)
@@ -817,7 +816,7 @@ def generateReportDataForDates(beginDate,endDate,locationID,db_session,headers):
     LOCAL_tzone = tz.gettz(msmSquareConfig['localTimezone'])
     deltaDays = endDate-beginDate
     threads = list()
-    maxthreads = 10
+    maxthreads = 5
     global sema
     sema = threading.Semaphore(value=maxthreads)
     for i in range(deltaDays.days + 1):
@@ -830,7 +829,8 @@ def generateReportDataForDates(beginDate,endDate,locationID,db_session,headers):
         endTimeTZ = endTime.astimezone(LOCAL_tzone)
         endTime=endTime.astimezone(UTC_tzone).strftime('%Y-%m-%dT%H:%M:%SZ')
         beginTime=beginTime.astimezone(UTC_tzone).strftime('%Y-%m-%dT%H:%M:%SZ')
-        x = threading.Thread(target=generateSummaryStatsForDateRange,args=(beginTime,endTime,locationID,spelledDate,db_session,headers))
+        logging.info('Generating Report for: %s for Location %s', spelledDate, locationID)
+        x = threading.Thread(target=generateSummaryStatsForDateRange,args=(beginTime,endTime,locationID,db_session,headers))
         threads.append(x)
         x.start()
     for t in threads:

@@ -7,7 +7,6 @@ from datetime import datetime, timedelta, date, time, timezone
 from dateutil import tz
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import create_engine
-import threading
 
 import yaml
 
@@ -46,17 +45,9 @@ endDate=date(2024,6,12)
 #locationID='8CY2M680JGBJE' #MSM
 #locationID='LBR2E5T341WDH' #Webstore
 
-
-threads = list()
 for location in msmsquare.getLocations(db_session, headers):
     #do for each location
-    x = threading.Thread(target=msmsquare.generateReportDataForDates,args=(beginDate,endDate, location['id'],db_session, headers))
-    threads.append(x)
-    x.start()
-    #msmsquare.generateReportDataForDates(beginDate,endDate, location['id'],db_session, headers)
-
-for t in threads:
-    t.join()
+    msmsquare.generateReportDataForDates(beginDate,endDate, location['id'],db_session, headers)
 
 #test = msmsquare.generateReportDataForDates(beginDate,endDate, locationID,db_session, headers)
 # test = msmsquare.getPayment('E2EIz42nt0BCvi75DxmyPsMF', db_session, headers)

@@ -676,7 +676,7 @@ def summaryFinancialsForPurchase(paymentsAndOrders, locationID, db_session, head
                     special_events.append({item['name']:item['total_money']['amount']})
                 elif category['categoryName'].lower() == 'fares':
                     finStats['fares'] += item['total_money']['amount']
-                elif category['categoryName'].lower == 'passes':
+                elif category['categoryName'].lower() == 'passes':
                     finStats['passes'] += item['total_money']['amount']
                 elif category['categoryName'].lower() == 'donations':
                     finStats['donations'] += item['total_money']['amount']

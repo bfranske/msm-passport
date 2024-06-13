@@ -805,7 +805,6 @@ def generateSummaryStatsForDateRange(beginTime,endTime,locationID,db_session, he
             db_session.commit()
     except MultipleResultsFound:
         raise Exception('Multiple Daily Reports Found in Database with same location and start/end date')
-    db_session.remove()
     return totalSummaries
 
 def generateReportDataForDates(beginDate,endDate,locationID,db_session,headers):

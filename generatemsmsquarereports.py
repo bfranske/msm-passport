@@ -38,8 +38,8 @@ Session = sessionmaker(db)  # Create a session class associated with the databas
 
 db_session = Session() # create a working database session for version 2
 
-beginDate=date(2024,6,17)
-endDate=date(2024,6,18)
+beginDate=date(2024,6,1)
+endDate=date(2024,7,16)
 #locationID='M225NFD7TJ8ZJ' #CHSL
 #locationID='5RT3Z6SAPGQB7' #ESL
 #locationID='8CY2M680JGBJE' #MSM

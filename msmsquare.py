@@ -649,7 +649,7 @@ def summaryFinancialsForPurchase(paymentsAndOrders, locationID, db_session, head
         for item in lineItems:
             if locationID == 'LBR2E5T341WDH':
                 # Webstore sale, put all in online category, except for streetcar camp registrations
-                if item['name']:
+                if 'name' in item:
                     if item['name'] == 'Streetcar Camp':
                         special_events.append({item['name']:item['total_money']['amount']})
                     else:
@@ -719,7 +719,7 @@ def summaryFinancialsForRefund(refundIDs, locationID, db_session, headers):
     for item in lineItems:
         if locationID == 'LBR2E5T341WDH':
                 # Webstore sale, put all in online category, except for streetcar camp registrations
-                if item['name']:
+                if 'name' in item:
                     if item['name'] == 'Streetcar Camp':
                         special_events.append({item['name']:0-item['total_money']['amount']})
                     else:

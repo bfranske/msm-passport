@@ -31,9 +31,12 @@ Session(app)
 # This section is needed for url_for("foo", _external=True) to automatically
 # generate http scheme when this sample is running on localhost,
 # and to generate https scheme when it is deployed behind reversed proxy.
-# See also https://flask.palletsprojects.com/en/1.0.x/deploying/wsgi-standalone/#proxy-setups
+# See also https://flask.palletsprojects.com/en/stable/deploying/proxy_fix/
 from werkzeug.middleware.proxy_fix import ProxyFix
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+app.wsgi_app = ProxyFix(
+    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+)
 
 logging.basicConfig(level=logging.INFO)
 

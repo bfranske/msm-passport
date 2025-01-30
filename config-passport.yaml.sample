@@ -7,6 +7,9 @@ clientSecret: "MICROSOFTCLIENTSECRETHERE"
 # App Authority URI
 authorityURI: "MICROSOFTAUTHORITYURI"
 
+# Server name
+serverName: "apps.trolleyride.org"
+
 # Redirect Path Set in Azure AD Application Registration
 redirectPath: "/getAToken"
 

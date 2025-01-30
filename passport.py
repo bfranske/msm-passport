@@ -23,6 +23,8 @@ except IOError:
 app = Flask(__name__)
 # Translate yaml config to flask config for session type
 app.config['SESSION_TYPE'] = passportConfig['sessionType']
+app.config['SERVER_NAME'] = passportConfig['apps.trolleyride.org']
+app.config['PREFERRED_URL_SCHEME'] = passportConfig['https']
 
 Session(app)
 

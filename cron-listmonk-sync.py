@@ -1,5 +1,6 @@
 #! /usr/bin/python3
 import logging
+import yaml
 import requests
 from pprint import pprint
 import json

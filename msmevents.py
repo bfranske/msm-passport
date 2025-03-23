@@ -62,7 +62,7 @@ def processEventCustomersForm(form):
                     totalTicketsSold+=item['quantity']
     # If there are more than 100 people...
     if r.links.get('next'):
-        r = requests.get(response.links['next']['url'], auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
+        r = requests.get(r.links['next']['url'], auth=(eventsConfig['wcConsumerKey'], eventsConfig['wcConsumerSecret']))
         orders = r.json()
         for order in orders:
             if variationID:

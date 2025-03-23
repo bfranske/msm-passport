@@ -2,6 +2,7 @@ config-msmevents.yaml
 config-msmcharters.yaml
 config-msmsquare.yaml
 config-passport.yaml
+config-listmonk.yaml
 flask_session/*
 .vscode/*
 __pycache__/*

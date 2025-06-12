@@ -6,7 +6,7 @@ from pprint import pprint
 from datetime import datetime, timedelta, date, time, timezone
 from dateutil import tz
 import yaml
-from  sqlalchemy import desc
+from sqlalchemy import desc
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import create_engine
 

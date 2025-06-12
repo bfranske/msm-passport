@@ -817,6 +817,21 @@ def generateReportDataForDates(beginDate,endDate, locationID,db_session, headers
         generateSummaryStatsForDateRange(beginTime,endTime,locationID,db_session, headers)
     return
 
+def getReportDataForDatesFromOneLocation(beginDate,endDate, locationID, db_session, headers):
+    UTC_tzone = tz.gettz('UTC')
+    LOCAL_tzone = tz.gettz(msmSquareConfig['localTimezone'])
+    reportData = []
+    newDayTime = time(3,0,0,tzinfo=LOCAL_tzone)
+    beginTime = datetime.combine(beginDate, newDayTime)
+    beginTimeTZ = beginTime.astimezone(LOCAL_tzone)
+    endTime = datetime.combine(endDate, newDayTime)
+    endTimeTZ = endTime.astimezone(LOCAL_tzone)
+    reportsInDB = db_session.query(DailyReport).filter(DailyReport.reportStartDate.between(beginTimeTZ,endTimeTZ), DailyReport.location_id==locationID).order_by(DailyReport.location_name,DailyReport.reportStartDate).all()
+    for report in reportsInDB:
+        spelledDate = report.reportStartDate.strftime('%A %B %-d, %Y')
+        reportData.append({'location':report.location_name, 'date': spelledDate, 'created': report.reportCreationDate, 'data': report.data})
+    return reportData
+
 def getReportDataForDatesFromDBAllLocations(beginDate,endDate, db_session, headers):
     UTC_tzone = tz.gettz('UTC')
     LOCAL_tzone = tz.gettz(msmSquareConfig['localTimezone'])
